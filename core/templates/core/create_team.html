@@ -1,0 +1,191 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+
+{% block style %}
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+  <link href="https://raw.githack.com/ttskch/select2-bootstrap4-theme/master/dist/select2-bootstrap4.css" rel="stylesheet"> <!-- for live demo page --> 
+{% endblock %}
+
+{% block content %}
+
+<main id="main" class="main">
+
+    
+  <div class="message-div">
+    {% for message in messages %}
+      <div class="container-fluid mt-1 mx-1">
+        <div
+          class="alert {{ message.tags }} alert-dismissible fade show"
+          role="alert"
+        >
+          {{ message }}
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+    <div class="pagetitle">
+      <h1>Create team </h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item active">Create team</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <div class="row">
+      <form class="row g-3 needs-validation" method="POST" action="{% url 'create-team' %}" >
+      {% csrf_token %}
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Choose your players <span>(15 Only) </span> </h5>
+            <div class="col-md-12">
+              <div class="form-floating mt-3">
+                <select id="selected_players" multiple data-allow-clear="1" placeholder="  Choose Players" onchange="selectedPlayers()" class="form-select" name="players" aria-label="State">
+                  {% for player in all_players %}
+                      <option class="selected_players_class" value={{ player.id }}>{{ player.name|title }}</option>
+                  {% endfor %}
+                </select>
+                  {% comment %} <label for="floatingSelect">Choose Players</label>  {% endcomment %}
+              </div>
+            </div>   
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3">
+        <div class="card">
+          <div class="card-body">     
+            <h5 class="card-title">Your captain <span>(x2 Pts) </span> </h5>                
+            <div class="col-md-12">
+              <div class="form-floating mt-3">
+                <select id="select_captain"  data-allow-clear="1" placeholder=" Choose Captain"  class="form-select" name="captain" aria-label="State"> 
+                </select>
+              </div>
+            </div>   
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3">
+        <div class="card">
+          <div class="card-body">   
+            <h5 class="card-title">Your vice captain <span>(x1.5 Pts) </span> </h5> 
+            <div class="col-md-12">
+              <div class="form-floating mt-3">
+                <select id="select_vice_captain"  data-allow-clear="1" placeholder=" Choose Vice Captain"  class="form-select" name="vice_captain" aria-label="State">
+                </select>   
+              </div>
+            </div>   
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Your Bonus Matches <span>(Only 5)  </span> </h5> 
+            <div class="col-md-12">
+              <div class="form-floating mt-3">
+                <select id="selected_matches" multiple data-allow-clear="1" placeholder="  Choose Matches" class="form-select" name="matches" aria-label="State">
+                  {% for match in all_matches %}
+                      <option class="selected_players_class" value={{ match.id }}>{{ match.name|title }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>   
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Predict Orange Cap winner <span>(50 Pts) </span> </h5> 
+            <div class="col-md-12">
+              <div class="form-floating mt-3">
+                <select id="selected_orange_cap" data-allow-clear="1" placeholder="  Predict Orange Cap Winner" class="form-select" name="orange_cap" aria-label="State">
+                  {% for player in all_players %}
+                      <option class="selected_players_class" value={{ player.id }}>{{ player.name|title }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>   
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Predict Purple Cap winner <span>(50 Pts) </span> </h5> 
+
+            <div class="col-md-12">
+              <div class="form-floating mt-3">
+                <select id="selected_purple_cap" data-allow-clear="1" placeholder="  Predict Purple Cap Winner" class="form-select" name="purple_cap" aria-label="State">
+                  {% for player in all_players %}
+                      <option class="selected_players_class" value={{ player.id }}>{{ player.name|title }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>   
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary w-100" type="submit">
+        Create Team
+      </button>
+      </form>
+    </div>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+  <!-- SELECT2 -->
+  <script>
+    
+
+    function selectedPlayers() {
+      selected_players = [];
+      for (var option of document.getElementById('selected_players').options)
+      {
+          if (option.selected) {
+            selected_players.push([option.value, option.text]);
+          }
+      }
+
+      var cap_options = ""
+      for(var i=0; i<selected_players.length; i++){
+        cap_options += "<option value="+ selected_players[i][0] +">"+selected_players[i][1]+"</option>"
+      }
+      document.getElementById("select_captain").innerHTML = cap_options;
+      document.getElementById("select_vice_captain").innerHTML = cap_options;
+
+    }
+
+    $(function () {
+      $.noConflict();
+        $('select').each(function () {
+          $(this).select2({
+            theme: 'bootstrap4',
+            width: 'style',
+            placeholder: $(this).attr('placeholder'),
+            allowClear: Boolean($(this).data('allow-clear')),
+          });
+        }); 
+      });
+    </script>
+
+{% endblock %}

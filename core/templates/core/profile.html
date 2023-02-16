@@ -1,0 +1,231 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+
+{% block style %}
+  <link href="{% static 'core/assets/css/profile.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+<main id="main" class="main">
+
+    
+  <div class="message-div">
+    {% for message in messages %}
+      <div class="container-fluid mt-1 mx-1">
+        <div
+          class="alert {{ message.tags }} alert-dismissible fade show"
+          role="alert"
+        >
+          {{ message }}
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+    <div class="pagetitle">
+      <h1>Profile {% if viewing_another_profile %} - {{ profile_viewing.user.username }} {% endif %} </h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item">Users</li>
+          <li class="breadcrumb-item active">Profile</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section profile">
+      <div class="row">
+        <div class="col-xl-4">
+
+          <div class="row">
+            <div class="col-6">
+              <div class="card">
+                <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+                  <h2>{{ profile_viewing.rank }}</h2>
+                  <h6> {% if viewing_another_profile %} {{ profile_viewing.user.username }} {% else %} Your {% endif %} Rank</h6>
+                </div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="card">
+                <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+                  <h2>{{ profile_viewing.total_score }}</h2>
+                  <h6> {% if viewing_another_profile %} {{ profile_viewing.user.username }} {% else %} Your {% endif %} Score</h6>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+              <h2>{{ profile_viewing.captain.name|title }}</h2>
+              <h6> {% if viewing_another_profile %} {{ profile_viewing.user.username }}'s {% else %} Current {% endif %} Captain</h6>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+              <h2>{{ profile_viewing.vice_captain.name|title }}</h2>
+              <h6> {% if viewing_another_profile %} {{ profile_viewing.user.username }}'s {% else %} Current {% endif %} Vice Captain</h6>
+
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col-xl-8">
+
+          <div class="card">
+            <div class="card-body pt-3">
+              <!-- Bordered Tabs -->
+              <ul class="nav nav-tabs nav-tabs-bordered">
+
+                <li class="nav-item">
+                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">My Team</button>
+                </li>
+                {% if not viewing_another_profile %}
+                <li class="nav-item">
+                  <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit">Edit Team</button>
+                </li>
+                {% endif %}
+
+                
+
+              </ul>
+              <div class="tab-content pt-2">
+
+                <div class="tab-pane fade show active profile-overview" id="profile-overview">
+                  
+                  <div class="card-body">
+
+                    <h5 class="card-title">Team Details</h5>
+                  
+                    <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th scope="col">Player</th>
+                          <th scope="col">Bat</th>
+                          <th scope="col">Bowl</th>
+                          <th scope="col">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                         {% for player, points in profile_viewing_player_points.items %}
+                          <tr>
+                            {% if player == profile_viewing_cap.name %}
+                              <td class="table-content"><a href="#" >{{ player|title }} (c) </a></td>
+                            {% elif player == profile_viewing_vice_cap.name %}
+                              <td class="table-content"><a href="#">{{ player|title }} (vc) </a></td>
+                            {% else %}
+                              <td class="table-content"><a href="#">{{ player|title }}</a></td>
+                            {% endif %}
+                            <td class="table-content">{{ points.0 }}</td>
+                            <td class="table-content">{{ points.1 }}</td>
+                            <td class="table-content"><span>{{ points.2 }}</span></td>
+                          </tr>
+                        {% endfor %}         
+                      </tbody>
+                    </table>
+
+                  </div>                
+
+                </div>
+
+                <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+
+                  <!-- Captain Edit Form -->
+                  <form action="{% url 'edit-captain' %}" method="post">
+                    {% csrf_token %}  
+                    <div class="row mb-3">
+                      <label for="captain" class="col-md-4 col-lg-3 col-form-label edit-profile-label">Captain</label>
+                      <div class="col-md-5 col-lg-6">
+                        <select class="form-select" id="floatingSelect" aria-label="State" name="captain" required>
+                          {% for player in profile_viewing_players %}
+                            {% if player != profile_viewing_vice_cap %}
+                              {% if player == profile_viewing_cap %}
+                                <option value="{{ player.id }}" selected>{{ player.name }}</option>
+                              {% else %}
+                                <option value="{{ player.id }}">{{ player.name }}</option>
+                              {% endif %}
+                            {% endif %}
+                          {% endfor %}     
+                        </select>
+                      </div>
+                      <div class="col-md-3 col-lg-3 edit-profile">
+                        <div class="text-center">
+                          {% if profile_viewing.captain_changes != 0 %}
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                          {% else %}
+                            <button type="submit" class="btn btn-primary" disabled>Save Changes</button>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>                                 
+                  </form><!-- End Captain Edit Form -->
+                  <div class="message">
+                    {% if profile_viewing.captain_changes != 0 %}
+                      <p> <small> *Can change the captain only {{ profile_viewing.captain_changes }} time(s)</small> </p>
+                    {% else %}
+                      <p> <small> *Cannot make any changes </small> </p>
+                    {% endif %}
+                  </div>
+                  <hr>
+
+                  <!--Vice Captain Edit Form -->
+                  <form action="{% url 'edit-vice-captain' %}" method="post">
+                    {% csrf_token %}  
+                    <div class="row mb-3">
+                      <label for="captain" class="col-md-4 col-lg-3 col-form-label edit-profile-label">Vice Captain</label>
+                      <div class="col-md-5 col-lg-6">
+                        <select class="form-select" id="floatingSelect" aria-label="State" name="vice_captain" required>
+                          {% for player in profile_viewing_players %}
+                            {% if player != profile_viewing_cap %}
+                              {% if player == profile_viewing_vice_cap %}
+                                <option value="{{ player.id }}" selected>{{ player.name }}</option>
+                              {% else %}
+                                <option value="{{ player.id }}">{{ player.name }}</option>
+                              {% endif %}
+                            {% endif %}
+                          {% endfor %}     
+                        </select>
+                      </div>
+                      <div class="col-md-3 col-lg-3 edit-profile">
+                        <div class="text-center">
+                          {% if profile_viewing.vice_captain_changes != 0 %}
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                          {% else %}
+                            <button type="submit" class="btn btn-primary" disabled>Save Changes</button>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>                                 
+                  </form><!-- End Vice Captain Edit Form -->
+                  <div class="message">
+                    {% if profile_viewing.vice_captain_changes != 0 %}
+                      <p> <small> *Can change the vice captain only {{ profile_viewing.vice_captain_changes }} time(s)</small> </p>
+                    {% else %}
+                      <p> <small> *Cannot make any changes </small> </p>
+                    {% endif %}
+                  </div>
+                  <hr>
+
+                </div>
+              </div><!-- End Bordered Tabs -->
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+{% endblock %}

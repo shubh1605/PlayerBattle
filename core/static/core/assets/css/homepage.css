@@ -1,0 +1,53 @@
+.ps-3 h5 {
+    padding: 10px 0 2px 0;
+    font-weight: 500;
+    color: #012970;
+    font-family: "Poppins", sans-serif;
+}
+
+.card-title {
+    padding: 16px 0 8px 0;
+    font-size: 18px;
+    font-weight: 500;
+    color: #012970;
+    font-family: "Poppins", sans-serif;
+  }
+
+  .title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #012970;
+    font-family: "Poppins", sans-serif;
+  }
+
+  .title span {
+    color: #899bbd;
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+.toss-span {
+    color: #012970;
+    font-size: 14px;
+    font-weight: 400;
+    font-family: "Poppins", sans-serif;
+}
+
+.right-border-custom {
+    border-right: 1px solid #9A9A9A;
+}
+
+.score-row-title th{
+    color: #012970;
+    font-size: 16px;
+    font-weight: 500;
+    font-family: "Poppins", sans-serif;
+}
+
+.score-row th{
+    color: black;
+    font-size: 14px;
+    font-weight: 400;
+    font-family: "Poppins", sans-serif;
+}
+

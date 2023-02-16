@@ -155,6 +155,8 @@ def home_page(request):
 	players = Player.objects.all().order_by('-total_points').values()
 	best_batsman = players.order_by('-bat_points').values()[0]
 	best_bowler = players.order_by('-bowl_points').values()[0]
+
+	is_match_live = Variable.objects.all()[0]
 	
 
 	context = {
@@ -162,6 +164,7 @@ def home_page(request):
 		'players':players,
 		'best_batsman':best_batsman,
 		'best_bowler':best_bowler,
+		'is_match_live':is_match_live.match_live
 	}
 	return render(request, 'core/home_page.html', context)
 

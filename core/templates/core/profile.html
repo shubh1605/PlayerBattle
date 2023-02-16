@@ -34,7 +34,7 @@
       <h1>Profile {% if viewing_another_profile %} - {{ profile_viewing.user.username }} {% endif %} </h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'home-page' %}">Dashboard</a></li>
           <li class="breadcrumb-item">Users</li>
           <li class="breadcrumb-item active">Profile</li>
         </ol>
@@ -89,7 +89,9 @@
               <ul class="nav nav-tabs nav-tabs-bordered">
 
                 <li class="nav-item">
-                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">My Team</button>
+                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-overview">
+                    {% if not viewing_another_profile %} My {% else %} {{ profile_viewing.user.username|title }}'s {% endif %} Team
+                  </button>
                 </li>
                 {% if not viewing_another_profile %}
                 <li class="nav-item">

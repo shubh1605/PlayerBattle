@@ -32,23 +32,25 @@
       <h1>Dashboard</h1>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+          {% comment %} <li class="breadcrumb-item"><a href="{% url 'home-page' %}">Home</a></li> {% endcomment %}
           <li class="breadcrumb-item active">Dashboard</li>
         </ol>
       </nav>
-    </div><!-- End Page Title -->
+    </div>
+    <!-- End Page Title -->
 
     <section class="section dashboard">
       <div class="row">
 
         <!-- Left side columns -->
         <div class="col-lg-8">
-            
+            {% if is_match_live %}
             <div class="row">
               <div class="card">
                 <div class="card-body">
                   <h5 class="card-title">Live Score <span>| Match Name </span> </h5>
-                  <div><span class="toss-span">Update</span> </div>
+                  <div><span class="toss-span">Update</span></div>
+                  <div><span class="score-span">Score</span></div>
                   <hr>
                   <div class="row">
                     <div class="col-lg-6">
@@ -133,6 +135,7 @@
                 </div>
               </div>
             </div>
+            {% endif %}
 
             <!-- Overall Player Points -->
             <div class="col-12">

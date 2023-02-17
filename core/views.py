@@ -11,7 +11,7 @@ import requests
 import json
 
 
-from core.models import Match, Player, Variable
+from core.models import Change, Match, Player, Variable
 from users.models import Profile
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
@@ -287,6 +287,7 @@ def profile(request, id):
 
 	prof_viewing = Profile.objects.get(user=profile_viewing_user)
 	profile_viewing_player_points = json.loads(prof_viewing.points)
+	print(profile_viewing_player_points)
 	profile_viewing_players = prof_viewing.players.all()
 	profile_viewing_cap =prof_viewing.captain
 	profile_viewing_vice_cap = prof_viewing.vice_captain
@@ -307,7 +308,7 @@ def profile(request, id):
 def search_user(request):
 	try:
 		user_name = request.POST['searched_username'].strip()
-		print(User.objects.get(username=user_name))
+		# print(User.objects.get(username=user_name))
 		userid = User.objects.get(username=user_name).id
 		# print(user_name)
 		return redirect('profile', id=userid)
@@ -325,11 +326,16 @@ def edit_captain(request):
 	new_cap = Player.objects.get(id=new_cap_id)
 	prof = Profile.objects.get(user=request.user)
 	if prof.captain_changes != 0:
+		new_change = Change()
+		new_change.user = request.user
+		new_change.description = f'captain changed from {prof.captain} to {new_cap}'
 		prof.captain = new_cap
 		prof.captain_changes -= 1
 		message = f'Changes made!'
 		messages.success(request, message )
 		prof.save()
+		new_change.save()
+		
 		return redirect('profile', id=request.user.id)
 	else:
 		message = f'No more changes can be made!'
@@ -341,9 +347,13 @@ def edit_vice_captain(request):
 	new_vice_cap = Player.objects.get(id=new_vice_cap_id)
 	prof = Profile.objects.get(user=request.user)
 	if prof.vice_captain_changes != 0:
+		new_change = Change()
+		new_change.user = request.user
+		new_change.description = f'captain changed from {prof.vice_captain} to {new_vice_cap}'
 		prof.vice_captain = new_vice_cap
 		prof.vice_captain_changes -= 1
 		prof.save()
+		new_change.save()
 		message = f'Changes made!'
 		messages.success(request, message )
 		return redirect('profile', id=request.user.id)

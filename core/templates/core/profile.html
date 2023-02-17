@@ -134,11 +134,11 @@
                          {% for player, points in profile_viewing_player_points.items %}
                           <tr>
                             {% if player == profile_viewing_cap.name %}
-                              <td class="table-content"><a href="#" >{{ player|title }} (c) </a></td>
+                              <td class="table-content">{{ player|title }} (c)</td>
                             {% elif player == profile_viewing_vice_cap.name %}
-                              <td class="table-content"><a href="#">{{ player|title }} (vc) </a></td>
+                              <td class="table-content">{{ player|title }} (vc) </td>
                             {% else %}
-                              <td class="table-content"><a href="#">{{ player|title }}</a></td>
+                              <td class="table-content">{{ player|title }}</td>
                             {% endif %}
                             <td class="table-content">{{ points.0 }}</td>
                             <td class="table-content">{{ points.1 }}</td>

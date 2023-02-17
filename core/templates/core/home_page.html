@@ -142,7 +142,7 @@
               <div class="card recent-sales overflow-auto">
                 <div class="card-body" >
                   <h5 class="card-title">User Points <span>| Overall</span></h5>
-                  <table class="table table-borderless datatable" id="user_points">
+                  <table class="table table-hover datatable" id="user_points">
                     <thead>
                       <tr>
                         {% comment %} <th scope="col">#</th> {% endcomment %}
@@ -154,9 +154,9 @@
                     <tbody>
                       {% for user in users %}
                       <tr>
-                        <td><span class="badge bg-success">{{ user.rank }}</span></td>
-                        <td><a href="{% url 'profile' user.user.id %}" class="text-primary">{{ user.user.username|title }}</a></td>
-                        <td><span class="badge bg-success">{{ user.total_score }}</span></td>
+                        <td class="table-content"><span class="badge bg-success">{{ user.rank }}</span></td>
+                        <td class="table-content"><a href="{% url 'profile' user.user.id %}" class="text-primary">{{ user.user.username|title }}</a></td>
+                        <td class="table-content"><span class="badge bg-success">{{ user.total_score }}</span></td>
                       </tr>
                       {% endfor %}
                     </tbody>
@@ -171,7 +171,7 @@
                 <div class="card-body" >
                   <h5 class="card-title">Player Points <span>| Overall</span></h5>
 
-                  <table class="table table-borderless datatable" id="player_points">
+                  <table class="table table-hover datatable" id="player_points">
                     <thead>
                       <tr>
                         <th scope="col">Player</th>
@@ -184,10 +184,10 @@
                       {% for player in players %}
                       <tr>
                         {% comment %} <th scope="row"><a href="#">#</a></th> {% endcomment %}
-                        <td><a href="{% url 'player-stats' %}?player_id={{ player.id }}" class="text-primary">{{ player.name|title }}</a></td>
-                        <td>{{ player.bat_points }}</td>
-                        <td>{{ player.bowl_points }}</td>
-                        <td><span class="badge bg-success">{{ player.total_points }}</span></td>
+                        <td class="table-content"><a href="{% url 'player-stats' %}?player_id={{ player.id }}" class="text-primary">{{ player.name|title }}</a></td>
+                        <td class="table-content">{{ player.bat_points }}</td>
+                        <td class="table-content">{{ player.bowl_points }}</td>
+                        <td class="table-content"><span class="badge bg-success">{{ player.total_points }}</span></td>
                       </tr>
                       {% endfor %}
         

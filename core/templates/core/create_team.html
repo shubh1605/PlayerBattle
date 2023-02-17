@@ -237,7 +237,6 @@
       }); 
         $('#selected_matches').each(function () {
           $(this).select2({
-            minimumSelectionLength: 2,
             maximumSelectionLength: 5,
             theme: 'bootstrap4',
             width: 'style',
@@ -247,7 +246,7 @@
         }); 
         $('#selected_players').each(function () {
           $(this).select2({
-            maximumSelectionLength: 3,
+            maximumSelectionLength: 15,
             theme: 'bootstrap4',
             width: 'style',
             placeholder: $(this).attr('placeholder'),
@@ -266,20 +265,24 @@
         var all_matches = document.getElementById('selected_matches')
         var matches = [...all_matches.options].filter(option => option.selected)
 
-        if(players.length < 15){
+        if(players.length != 15){
           document.getElementById("player_errors").style.display = "block";
-          document.getElementById("player_errors").innerHTML =`You have selected only ${players.length}. Please select 15.`
+          document.getElementById("player_errors").innerHTML =`You have selected ${players.length}. Please select 15.`
         } else {
           document.getElementById("player_errors").style.display = "none";
         }
 
-        if(matches.length < 5){
+        if(matches.length != 5){
           document.getElementById("match_errors").style.display = "block";
-          document.getElementById("match_errors").innerHTML =`You have selected only ${matches.length}. Please select 5.`
+          document.getElementById("match_errors").innerHTML =`You have selected ${matches.length}. Please select 5.`
         } else {
           document.getElementById("match_errors").style.display = "none";
         }
 
+        if(players.length == 15 && matches.length == 5){
+
+          createTeamForm.submit();
+        }
       });
     </script>
 

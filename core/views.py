@@ -291,6 +291,7 @@ def profile(request, id):
 	profile_viewing_cap =prof_viewing.captain
 	profile_viewing_vice_cap = prof_viewing.vice_captain
 	sorted_points = dict(sorted(profile_viewing_player_points.items(), key=lambda x:x[1][2],reverse=True))
+	profile_viewing_matches = prof_viewing.matches.all()
 	# print(sorted_points)
 	context = {
 		'profile_viewing_player_points': sorted_points,
@@ -299,6 +300,7 @@ def profile(request, id):
 		'profile_viewing_vice_cap': profile_viewing_vice_cap,
 		'profile_viewing': prof_viewing,
 		'viewing_another_profile': viewing_another_prof,
+		'profile_viewing_matches': profile_viewing_matches,
 	}
 	return render(request, 'core/profile.html', context)
 
@@ -371,11 +373,13 @@ def create_team(request):
 			prof.captain = Player.objects.get(id=captain)
 			prof.vice_captain = Player.objects.get(id = vice_captain)
 
+			prof.players.clear()
 			for pid in players:
 				player = Player.objects.get(id=pid)
 				prof.players.add(player)
 				user_points[player.name] = [0,0,0]
-
+			
+			prof.matches.clear()
 			for mid in matches:
 				match = Match.objects.get(id=mid)
 				prof.matches.add(match)

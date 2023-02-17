@@ -1301,3 +1301,11 @@ h6 {
 .dataTable-top{
   float: left;
 }
+
+/* Create team style */
+
+.error_messages{
+  color: #ed3c0d;
+  text-align: left;
+  font-weight: 600;
+}

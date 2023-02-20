@@ -88,7 +88,7 @@ def end_match(request):
 					live_match.players.add(p)
 			# print(points)
 			# user_profiles = Profile.objects.all()
-			allot_points_to_user(points)
+			allot_points_to_user(points, live_match)
 
 			i = 1
 			for user_profile in Profile.objects.order_by('-total_score'):
@@ -109,45 +109,95 @@ def end_match(request):
 	else:
 			return HttpResponse("Login")
 
-def allot_points_to_user(match_points):
+def allot_points_to_user(match_points, match):
 	user_profiles = Profile.objects.all()
 	for user_profile in user_profiles:
-		user_players =  user_profile.players.all()
-		user_total_points = user_profile.total_score
-		user_captain = user_profile.captain.name
-		user_vicecaptain = user_profile.vice_captain.name
-		# print(user_profile)
-		# print(user_captain)
-		# print(user_vicecaptain)
-		# print(user_players)
+		
+		
 		try:
+			user_matches = user_profile.matches.all()
+			user_players =  user_profile.players.all()
+			user_total_points = user_profile.total_score
+			user_captain = user_profile.captain.name
+			user_vicecaptain = user_profile.vice_captain.name
+			match_bonus = 1
+			total = []
 			user_points = json.loads(user_profile.points)
-			# print(user_points)
-			
+			description = json.loads(user_profile.points_description)
+			description[match.name] = {}
+			user_match_players = {}
+			user_match_info = {}
+			user_match_info['captain'] = user_captain
+			user_match_info['vice_captain'] = user_vicecaptain
+
+			if match in user_matches:
+				match_bonus = 2
+				user_match_info['is_match_bonus'] = True
+			else:
+				user_match_info['is_match_bonus'] = False
+
+			total = [0,0,0]
 			for player in user_players:
+				
 				if(player.name in match_points):
+					# print(total)
+					# print(player.name)
+					user_match_players[player.name] = [0,0,0]
 					if(player.name == user_captain):
-						user_total_points += match_points[player.name][2] * 2
-						user_points[player.name][0] += match_points[player.name][0] * 2
-						user_points[player.name][1] += match_points[player.name][1] * 2
-						user_points[player.name][2] += match_points[player.name][2] * 2
+						user_total_points += (match_points[player.name][2] * 2 * match_bonus) 
+						for i in range(3):
+							user_points[player.name][i] += (match_points[player.name][i] * 2 * match_bonus)
+							total[i] += (match_points[player.name][i] * 2 * match_bonus)
+							user_match_players[player.name][i] = (match_points[player.name][i] * 2 * match_bonus)
+
 					elif(player.name == user_vicecaptain):
-						# print("here")
-						user_total_points += match_points[player.name][2] * 1.5
-						user_points[player.name][0] += match_points[player.name][0] * 1.5
-						user_points[player.name][1] += match_points[player.name][1] * 1.5
-						user_points[player.name][2] += match_points[player.name][2] * 1.5
+						user_total_points += (match_points[player.name][2] * 1.5 * match_bonus)
+						for i in range(3):
+							user_points[player.name][i] += (match_points[player.name][i] * 1.5 * match_bonus)
+							total[i] += (match_points[player.name][i] * 1.5 * match_bonus)
+							user_match_players[player.name][i] = (match_points[player.name][i] * 1.5 * match_bonus)
 					else:
-						user_total_points += match_points[player.name][2]
-						user_points[player.name][0] += match_points[player.name][0]
-						user_points[player.name][1] += match_points[player.name][1]
-						user_points[player.name][2] += match_points[player.name][2]
+						user_total_points += (match_points[player.name][2] * match_bonus)
+						for i in range(3):
+							user_points[player.name][i] += (match_points[player.name][i] * match_bonus)
+							total[i] += (match_points[player.name][i] * match_bonus)
+							user_match_players[player.name][i] = (match_points[player.name][i] * match_bonus)
 			
+			user_match_info['total'] = total
+
+			description[match.name]['Players'] = user_match_players
+			description[match.name]['Info'] = user_match_info
+
+			user_profile.points_description = json.dumps(description)
+
 			user_profile.total_score = user_total_points
 			user_profile.points = json.dumps(user_points)
 			user_profile.save()
-		except:
+		except Exception as inst:
+			print(inst)
 			print("error",user_profile)
+
+def allot_bonus_points(request):
+	users = Profile.objects.all()
+	orange_cap = request.POST['orange_cap']
+	purple_cap = request.POST['purple_cap']
+	
+	for user in users:
+		bonus = 0
+		bonus_points = {}
+		if str(user.orange_cap.id) == orange_cap:
+			bonus += 50
+			bonus_points['orange_cap'] = 50
+		if str(user.purple_cap.id) ==purple_cap:
+			bonus += 50
+			bonus_points['purple_cap'] = 50
+		bonus_points['total'] = bonus
+		user.total_score += bonus
+		user.bonus_points = json.dumps(bonus_points)	
+		user.save()
+	return HttpResponseRedirect(reverse('admin-func'))
+
+
 	
 
 def home_page(request):
@@ -209,9 +259,11 @@ def calculate_players_stats_view(request):
 def admin_func(request):
 	remaining_matches = Match.objects.filter(has_completed = False, is_live = False)
 	matches_live = Match.objects.filter(is_live=True)
+	players = Player.objects.all()
 	context = {
 		"remaining_matches": remaining_matches, 
 		"matches_live": matches_live,
+		"players":players,
 	}
 
 	return render(request, 'core/admin.html', context)
@@ -287,12 +339,15 @@ def profile(request, id):
 
 	prof_viewing = Profile.objects.get(user=profile_viewing_user)
 	profile_viewing_player_points = json.loads(prof_viewing.points)
-	print(profile_viewing_player_points)
+	# print(profile_viewing_player_points)
 	profile_viewing_players = prof_viewing.players.all()
 	profile_viewing_cap =prof_viewing.captain
 	profile_viewing_vice_cap = prof_viewing.vice_captain
 	sorted_points = dict(sorted(profile_viewing_player_points.items(), key=lambda x:x[1][2],reverse=True))
 	profile_viewing_matches = prof_viewing.matches.all()
+
+	points_description = json.loads(prof_viewing.points_description)
+	# print(points_description)
 	# print(sorted_points)
 	context = {
 		'profile_viewing_player_points': sorted_points,
@@ -500,15 +555,12 @@ def get_match_points(match_link, points):
 
 
 def add_all_players_match_wise(request):
-	# print("hello")
-	matches_src =  reqs.get("https://www.espncricinfo.com/series/icc-men-s-t20-world-cup-2022-23-1298134/match-schedule-fixtures-and-results").text
-	# print("hello")
+	series_name = "pakistan-super-league-2022-23-1332128"
+	matches_src =  reqs.get("https://www.espncricinfo.com/series/"+series_name+"/match-schedule-fixtures-and-results").text
 	matches_soup = BeautifulSoup(matches_src,'lxml')
-	# print("hello")
 	matches_data = matches_soup.find('div', class_ = "ds-w-full ds-bg-fill-content-prime ds-overflow-hidden ds-rounded-xl ds-border ds-border-line").find('div', class_ = "ds-p-0").findAll('div', class_ = "ds-p-4")
 	matches_link = []
-	# print("hello")
-	# print(len(matches_data))
+	
 
 
 	for match in matches_data:
@@ -522,8 +574,8 @@ def add_all_players_match_wise(request):
 		# print(match)
 		# match = matches_link[]
 
-		source = reqs.get("https://www.espncricinfo.com/series/icc-men-s-t20-world-cup-2022-23-1298134/"+match+"/full-scorecard").text
-		player_src = reqs.get("https://www.espncricinfo.com/series/icc-men-s-t20-world-cup-2022-23-1298134/"+match+"/match-playing-xi").text
+		source = reqs.get("https://www.espncricinfo.com/series/"+series_name+"/"+match+"/full-scorecard").text
+		player_src = reqs.get("https://www.espncricinfo.com/series/"+series_name+"/"+match+"/match-playing-xi").text
 
 		soup=BeautifulSoup(source,'lxml')
 		soup2 = BeautifulSoup(player_src, 'lxml')

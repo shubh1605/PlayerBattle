@@ -16,6 +16,7 @@ urlpatterns = [
     path('admin/',admin_func, name='admin-func'),
     path('admin/startmatch/', start_match, name='start-match'),
     path('admin/endmatch/', end_match, name='end-match'),
+    path('admin/allotbonuspoints/', allot_bonus_points, name='allot-bonus-points'),
     path('edit-captain/',edit_captain, name='edit-captain'),
     path('edit-vice-captain/',edit_vice_captain, name='edit-vice-captain'),
     path('search-user/',search_user, name='search-user'),

@@ -58,3 +58,14 @@
     font-family: "Poppins", sans-serif;
 }
 
+marquee{
+  font-size: 18px;
+  font-weight: 400;
+  color: #012970;
+  font-family: "Poppins", sans-serif;
+  border: 1px solid blacks;
+}
+
+.marquee-hr{
+  margin-top: 0px;
+}

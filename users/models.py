@@ -14,12 +14,24 @@ class Profile(models.Model):
     vice_captain = models.ForeignKey(Player,on_delete=models.CASCADE, related_name='vice_captain',null = True, blank = True)
     matches = models.ManyToManyField(Match,null = True, blank = True)
     points = JSONField(default=dict,blank=True,null=True)
+    bonus_points = JSONField(default=dict,blank=True,null=True)
+    points_description = JSONField(default=dict,blank=True,null=True)
     captain_changes = models.IntegerField(default = 1, blank=True, null= True)
     vice_captain_changes = models.IntegerField(default = 1, blank=True, null= True)
     rank = models.PositiveIntegerField(default=1, blank=True, null=True)
     orange_cap = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='orange_cap', default=None,null = True, blank = True)
     purple_cap = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='purple_cap', default=None,null = True, blank = True)
+     
 
     def __str__(self):
         return self.user.username
+
+    # points_description = {
+    #   "Match": {
+    #       'Players': {
+    #           'player_1' : [0,0,0],
+    #       }, 
+    #       'total':[0,0,0]
+    #   }
+    # }
     

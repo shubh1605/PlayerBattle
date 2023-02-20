@@ -1,7 +1,11 @@
 from bs4 import BeautifulSoup
 import requests	
 
-matches_src =  requests.get("https://www.espncricinfo.com/series/icc-men-s-t20-world-cup-2022-23-1298134/match-schedule-fixtures-and-results").text
+series_link = "indian-premier-league-2023-1345038"
+# series_link = "icc-men-s-t20-world-cup-2022-23-1298134"
+# series_link = "pakistan-super-league-2022-23-1332128"
+
+matches_src =  requests.get("https://www.espncricinfo.com/series/"+series_link+"/match-schedule-fixtures-and-results").text
 matches_soup = BeautifulSoup(matches_src,'lxml')
 
 matches_data = matches_soup.find('div', class_ = "ds-w-full ds-bg-fill-content-prime ds-overflow-hidden ds-rounded-xl ds-border ds-border-line").find('div', class_ = "ds-p-0").findAll('div', class_ = "ds-p-4")
@@ -14,11 +18,13 @@ for match in matches_data:
     temp_list = temp.split('/')
     matches_link.append(temp_list[3])
 
-all_players = []
-for match in matches_link[35:36]:
+print(matches_link)
 
-    source = requests.get("https://www.espncricinfo.com/series/icc-men-s-t20-world-cup-2022-23-1298134/"+match+"/full-scorecard").text
-    player_src = requests.get("https://www.espncricinfo.com/series/icc-men-s-t20-world-cup-2022-23-1298134/"+match+"/match-playing-xi").text
+all_players = []
+for match in matches_link[0:1]:
+
+    source = requests.get("https://www.espncricinfo.com/series/"+series_link+"/"+match+"/full-scorecard").text
+    player_src = requests.get("https://www.espncricinfo.com/series/"+series_link+"/"+match+"/match-playing-xi").text
 
     soup=BeautifulSoup(source,'lxml')
     soup2 = BeautifulSoup(player_src, 'lxml')
@@ -75,7 +81,7 @@ for match in matches_link[35:36]:
 
     all_matches_points[match] = points
 
-print(all_matches_points)
+# print(all_matches_points)
 
 
 

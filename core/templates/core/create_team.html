@@ -48,7 +48,7 @@
       <div class="col-lg-6">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Choose your players <span>(Select 15) </span> </h5>
+            <h5 class="card-title">Choose your players <span>(Select 13) </span> </h5>
             <div class="col-md-12">
               <div class="form-floating mt-3">
                 <select id="selected_players" multiple data-allow-clear="1" placeholder="  Choose Players" onchange="selectedPlayers()" class="form-select" name="players" aria-label="State" required>
@@ -95,7 +95,7 @@
       <div class="col-lg-4">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Your Bonus Matches <span>(Select 5)  </span> </h5> 
+            <h5 class="card-title">Your Bonus Matches <span>(Select 3)  </span> </h5> 
             <div class="col-md-12">
               <div class="form-floating mt-3">
                 <select id="selected_matches" multiple data-allow-clear="1" placeholder="  Choose Matches" class="form-select" name="matches" aria-label="State" required>
@@ -237,7 +237,7 @@
       }); 
         $('#selected_matches').each(function () {
           $(this).select2({
-            maximumSelectionLength: 5,
+            maximumSelectionLength: 3,
             theme: 'bootstrap4',
             width: 'style',
             placeholder: $(this).attr('placeholder'),
@@ -246,7 +246,7 @@
         }); 
         $('#selected_players').each(function () {
           $(this).select2({
-            maximumSelectionLength: 15,
+            maximumSelectionLength: 13,
             theme: 'bootstrap4',
             width: 'style',
             placeholder: $(this).attr('placeholder'),
@@ -265,22 +265,21 @@
         var all_matches = document.getElementById('selected_matches')
         var matches = [...all_matches.options].filter(option => option.selected)
 
-        if(players.length != 15){
+        if(players.length != 13){
           document.getElementById("player_errors").style.display = "block";
-          document.getElementById("player_errors").innerHTML =`You have selected ${players.length}. Please select 15.`
+          document.getElementById("player_errors").innerHTML =`You have selected ${players.length}. Please select 13.`
         } else {
           document.getElementById("player_errors").style.display = "none";
         }
 
-        if(matches.length != 5){
+        if(matches.length != 3){
           document.getElementById("match_errors").style.display = "block";
-          document.getElementById("match_errors").innerHTML =`You have selected ${matches.length}. Please select 5.`
+          document.getElementById("match_errors").innerHTML =`You have selected ${matches.length}. Please select 3.`
         } else {
           document.getElementById("match_errors").style.display = "none";
         }
 
-        if(players.length == 15 && matches.length == 5){
-
+        if(players.length == 13 && matches.length == 3){
           createTeamForm.submit();
         }
       });

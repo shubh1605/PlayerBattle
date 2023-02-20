@@ -1,0 +1,13 @@
+@media only screen and (max-width: 767px) {
+    .edit-profile {
+      margin-top: 1rem;
+    }
+}
+
+.message{
+  color: red;
+}
+
+.edit-pofile-label{
+  color: #2c384e;
+}

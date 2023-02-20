@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-t8*d%^+*g39pr6#cu30iwy@wy&m6hxa%dxe)_v*+lh6(q3b#0x
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["playerbattle.pythonanywhere.com",]
 
 
 # Application definition
@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'core',
-    
+
 ]
 
 SWEETIFY_SWEETALERT_LIBRARY = 'sweetalert2'
@@ -70,7 +70,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.users',
             ],
-        },    
+        },
     },
 ]
 
@@ -83,7 +83,8 @@ WSGI_APPLICATION = 'FantasyCricket.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': '/home/playerbattle/PlayerBattle/db.sqlite3'
     }
 }
 
@@ -126,6 +127,7 @@ PROJECT_DIR=os.path.dirname(__file__)
 STATIC_ROOT= os.path.join(PROJECT_DIR,'static_media/')
 
 STATIC_URL = 'static/'
+STATIC_ROOT = '/home/playerbattle/PlayerBattle/static'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field

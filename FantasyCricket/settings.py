@@ -83,8 +83,8 @@ WSGI_APPLICATION = 'FantasyCricket.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3', # FOR LOCAL HOST
-        # 'NAME': '/home/playerbattle/PlayerBattle/db.sqlite3' # FOR HOSTED
+        # 'NAME': BASE_DIR / 'db.sqlite3', # FOR LOCAL HOST
+        'NAME': '/home/playerbattle/PlayerBattle/db.sqlite3' # FOR HOSTED
     }
 }
 

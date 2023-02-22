@@ -9,10 +9,13 @@
 {% block content %}
 
 <main id="main" class="main">
-    {% if is_match_live %}
+
+  {% if is_match_live %}
+    <hr class="marquee-hr"/>
       <marquee>A match is live, your points will be added once the match ends.</marquee>
-      <hr class="marquee-hr"/>
-    {% endif %}
+    <hr class="marquee-hr"/>
+  {% endif %}
+    
     <div class="message-div">
       {% for message in messages %}
         <div class="container-fluid mt-1 mx-1">

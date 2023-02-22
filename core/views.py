@@ -88,8 +88,11 @@ def end_match(request):
 					p.save()
 					live_match.players.add(p)
 			# print(points)
-			# user_profiles = Profile.objects.all()
-			allot_points_to_user(points, live_match)
+			# user_profiles =  Profile.objects.filter(user__in= User.objects.filter(is_active=True))
+			no_error = allot_points_to_user(points, live_match)
+			print("hi",no_error)
+			if no_error:
+				return HttpResponseRedirect(reverse('admin-func'))
 
 			i = 1
 			for user_profile in Profile.objects.order_by('-total_score'):
@@ -111,10 +114,8 @@ def end_match(request):
 			return HttpResponse("Login")
 
 def allot_points_to_user(match_points, match):
-	user_profiles = Profile.objects.all()
-	for user_profile in user_profiles:
-		
-		
+	user_profiles =  Profile.objects.filter(user__in= User.objects.filter(is_active=True))
+	for user_profile in user_profiles:		
 		try:
 			user_matches = user_profile.matches.all()
 			user_players =  user_profile.players.all()
@@ -130,6 +131,7 @@ def allot_points_to_user(match_points, match):
 			user_match_info = {}
 			user_match_info['captain'] = user_captain
 			user_match_info['vice_captain'] = user_vicecaptain
+			user_match_info['match_id'] = match.id
 
 			if match in user_matches:
 				match_bonus = 2
@@ -137,13 +139,16 @@ def allot_points_to_user(match_points, match):
 			else:
 				user_match_info['is_match_bonus'] = False
 
-			total = [0,0,0]
+			total = [0.0,0.0,0.0]
+			
 			for player in user_players:
-				
 				if(player.name in match_points):
 					# print(total)
-					# print(player.name)
-					user_match_players[player.name] = [0,0,0]
+					
+					user_match_players[player.name] = [0.0,0.0,0.0]
+					print(user_match_players)
+					if player.name not in user_points:
+						user_points[player.name] = [0.0,0.0,0.0]
 					if(player.name == user_captain):
 						user_total_points += (match_points[player.name][2] * 2 * match_bonus) 
 						for i in range(3):
@@ -165,21 +170,20 @@ def allot_points_to_user(match_points, match):
 							user_match_players[player.name][i] = (match_points[player.name][i] * match_bonus)
 			
 			user_match_info['total'] = total
-
 			description[match.name]['Players'] = user_match_players
 			description[match.name]['Info'] = user_match_info
-
 			user_profile.points_description = json.dumps(description)
-
 			user_profile.total_score = user_total_points
 			user_profile.points = json.dumps(user_points)
 			user_profile.save()
-		except Exception as inst:
-			print(inst)
+		except Exception as e:
+			print(e)
 			print("error",user_profile)
+			return True
+	return False
 
 def allot_bonus_points(request):
-	users = Profile.objects.all()
+	users =  Profile.objects.filter(user__in= User.objects.filter(is_active=True))
 	orange_cap = request.POST['orange_cap']
 	purple_cap = request.POST['purple_cap']
 	
@@ -202,7 +206,8 @@ def allot_bonus_points(request):
 	
 
 def home_page(request):
-	users = Profile.objects.all()
+	users = Profile.objects.filter(user__in= User.objects.filter(is_active=True))
+	# print(Profile.objects.filter())
 	players = Player.objects.all().order_by('-total_points').values()
 	best_batsman = players.order_by('-bat_points').values()[0]
 	best_bowler = players.order_by('-bowl_points').values()[0]
@@ -348,7 +353,8 @@ def profile(request, id):
 	profile_viewing_matches = prof_viewing.matches.all()
 
 	points_description = json.loads(prof_viewing.points_description)
-	# print(points_description)
+	points_description = dict(reversed(list(points_description.items())))
+	
 	# print(sorted_points)
 	context = {
 		'profile_viewing_player_points': sorted_points,
@@ -358,6 +364,7 @@ def profile(request, id):
 		'profile_viewing': prof_viewing,
 		'viewing_another_profile': viewing_another_prof,
 		'profile_viewing_matches': profile_viewing_matches,
+		'points_description':points_description,
 	}
 	return render(request, 'core/profile.html', context)
 
@@ -449,7 +456,7 @@ def create_team(request):
 			for pid in players:
 				player = Player.objects.get(id=pid)
 				prof.players.add(player)
-				user_points[player.name] = [0,0,0]
+				user_points[player.name] = [0.0,0.0,0.0]
 			
 			prof.matches.clear()
 			for mid in matches:
@@ -490,11 +497,11 @@ def get_match_players(match_link):
 
 		y = x[1].find('a').attrs['href'].split('/')
 		z = y[2].split('-')[:-1]
-		players_dict[" ".join(z)] = [0,0,0]
+		players_dict[" ".join(z)] = [0.0,0.0,0.0]
 
 		y = x[2].find('a').attrs['href'].split('/')
 		z = y[2].split('-')[:-1]
-		players_dict[" ".join(z)] = [0,0,0]
+		players_dict[" ".join(z)] = [0.0,0.0,0.0]
 	
 	return players_dict
 	
@@ -520,7 +527,7 @@ def get_match_points(match_link, points):
 				name = (" ".join(name)).lower()
 				runs = int(td[2].find('strong').text)
 				if(name not in points):
-					points[name] = [0,0,0]
+					points[name] = [0.0,0.0,0.0]
 				points[name][0] += runs  
 				points[name][2] += runs  
 				
@@ -531,7 +538,7 @@ def get_match_points(match_link, points):
 				name = (" ".join(name)).lower()
 				wicks = int(td[4].find('strong').text)
 				if(name not in points):
-					points[name] = [0,0,0]
+					points[name] = [0.0,0.0,0.0]
 				points[name][1] += (wicks*25)  
 				points[name][2] += (wicks*25)  
 

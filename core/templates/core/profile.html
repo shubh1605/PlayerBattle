@@ -4,6 +4,16 @@
 
 {% block style %}
   <link href="{% static 'core/assets/css/profile.css' %}" rel="stylesheet">
+  <style>
+    button.acc-btn {
+      /* create a grid */
+      display: grid;
+      /* create colums. 1fr means use available space */
+      grid-template-columns: 1fr max-content max-content;
+      align-items: center;
+      grid-gap: 10px;
+    }
+  </style>  
 {% endblock %}
 
 {% block content %}
@@ -107,7 +117,7 @@
                 </li>
                 <li class="nav-item">
                   <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-description">
-                    Points Disribution
+                    Description
                   </button>
                 </li>
                 {% if not viewing_another_profile %}
@@ -180,18 +190,66 @@
                 <div class="tab-pane fade profile-overview" id="profile-description">
                   <div class="card-body">
                     <h5 class="card-title">Points Distribution</h5>
-                    <table class="table table-hover">
-                      <thead>
-                        <tr>
-                        </tr>
-                      </thead>
-                      <tbody>        
-                      </tbody>
-                    </table>
+                    <!-- Accordion without outline borders -->
+                    <div class="accordion accordion-flush" id="accordionFlushExample">
+                      {% for match, description in points_description.items %}
+                        <div class="accordion-item">
+                          <h2 class="accordion-header" id="flush-headingOne">
+                            <button class="acc-btn accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#match{{ description.Info.match_id }}" aria-expanded="false" aria-controls="flush-collapseOne">
+                                <span style="margin-right:10px;"> 
+                                  {{ match|title }} 
+                                  {% if description.Info.is_match_bonus %}
+                                    <span class="badge bg-success">BM</span>
+                                  {% endif %}
+                                </span>
+                                <span>
+                                  <b>{{ description.Info.total.2 }} pts</b>
+                                </span>
+                                
+                            </button>
+                          </h2>
+                          <div id="match{{ description.Info.match_id }}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                            <div class="accordion-body">
+                              <table class="table table-hover">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">Player</th>
+                                    <th scope="col">Bat</th>
+                                    <th scope="col">Bowl</th>
+                                    <th scope="col">Total</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {% for player, points in description.Players.items %}
+                                    <tr>
+                                      {% if player == description.Info.captain %}
+                                        <td class="table-content">{{ player|title }} (c)</td>
+                                      {% elif player == description.Info.vice_captain %}
+                                        <td class="table-content">{{ player|title }} (vc) </td>
+                                      {% else %}
+                                        <td class="table-content">{{ player|title }}</td>
+                                      {% endif %}
+                                      <td class="table-content">{{ points.0 }}</td>
+                                      <td class="table-content">{{ points.1 }}</td>
+                                      <td class="table-content"><span>{{ points.2 }}</span></td>
+                                    </tr> 
+                                  {% endfor %}
+                                    <tr>
+                                      <td class="table-content">Total</td>
+                                      <td class="table-content">{{ description.Info.total.0 }}</td>
+                                      <td class="table-content">{{ description.Info.total.1 }}</td>
+                                      <td class="table-content">{{ description.Info.total.2 }}</td>
+                                      
+                                    </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      {% endfor %}             
+                    </div><!-- End Accordion without outline borders -->                
                   </div> 
                 </div>
-
-
                 <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
                   <!-- Captain Edit Form -->
                   <form action="{% url 'edit-captain' %}" method="post">
@@ -280,4 +338,12 @@
     </section>
 
   </main>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+  <script>
+    
+  </script>
 {% endblock %}

@@ -59,7 +59,7 @@
 }
 
 marquee{
-  font-size: 18px;
+  font-size: 13px;
   font-weight: 400;
   color: #012970;
   font-family: "Poppins", sans-serif;
@@ -68,4 +68,5 @@ marquee{
 
 .marquee-hr{
   margin-top: 0px;
+  margin-bottom: 8px;
 }

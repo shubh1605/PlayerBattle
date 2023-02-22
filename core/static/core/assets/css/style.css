@@ -1309,3 +1309,9 @@ h6 {
   text-align: left;
   font-weight: 600;
 }
+
+#team_details_span{
+  color: #899bbd;
+  font-size: 13px;
+  font-weight: 700;
+}

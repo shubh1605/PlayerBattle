@@ -49,12 +49,16 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Choose your players <span>(Select 13) </span> </h5>
+            <span id="team_details_span"></span>
             <div class="col-md-12">
               <div class="form-floating mt-3">
                 <select id="selected_players" multiple data-allow-clear="1" placeholder="  Choose Players" onchange="selectedPlayers()" class="form-select" name="players" aria-label="State" required>
-                  {% for player in all_players %}
-                      <option class="selected_players_class" value={{ player.id }}>{{ player.name|title }}</option>
+                  {% for key,value in team_wise_players.items %}  
+                    {% for player in value %}
+                      <option class="selected_players_class" value={{ player.id }}>{{ player.name|title }} - {{ player.team_name|title }}</option>
+                    {% endfor %}
                   {% endfor %}
+            
                 </select>
                 <div id="player_errors" class="error_messages" display="none"></div>
                   {% comment %} <label for="floatingSelect">Choose Players</label>  {% endcomment %}
@@ -118,8 +122,10 @@
               <div class="form-floating mt-3">
                 <select id="selected_orange_cap" data-allow-clear="1" placeholder="  Predict Orange Cap Winner" class="form-select" name="orange_cap" aria-label="State" required>
                   <option disabled selected value> -- select an option -- </option>
-                  {% for player in all_players %}
+                  {% for key,value in team_wise_players.items %}  
+                    {% for player in value %}
                       <option class="selected_players_class" value={{ player.id }}>{{ player.name|title }}</option>
+                    {% endfor %}
                   {% endfor %}
                 </select>
               </div>
@@ -137,8 +143,10 @@
               <div class="form-floating mt-3">
                 <select id="selected_purple_cap" data-allow-clear="1" placeholder="  Predict Purple Cap Winner" class="form-select" name="purple_cap" aria-label="State" required>
                   <option disabled selected value> -- select an option -- </option>
-                  {% for player in all_players %}
+                  {% for key,value in team_wise_players.items %}  
+                    {% for player in value %}
                       <option class="selected_players_class" value={{ player.id }}>{{ player.name|title }}</option>
+                      {% endfor %}
                   {% endfor %}
                 </select>
               </div>
@@ -160,6 +168,11 @@
 
   <!-- SELECT2 -->
   <script>
+
+    const MAX_PLAYERS = 13;
+    const MAX_MATCHES = 3;
+    const MAX_PLAYERS_PER_TEAM = 3;
+    var MAX_PLAYERS_PER_TEAM_ERROR = false;
 
     function selectedCaptain() {
       var selected_option = document.getElementById("select_captain");
@@ -210,12 +223,39 @@
 
     function selectedPlayers() {
       selected_players = [];
+      team_wise = {};
       for (var option of document.getElementById('selected_players').options)
       {
           if (option.selected) {
             selected_players.push([option.value, option.text]);
+            var team_name = option.text.split(" - ")[1]
+            if(team_name in team_wise){
+              team_wise[team_name] = team_wise[team_name] + 1;
+            } else {
+              team_wise[team_name] = 1;
+            }
           }
       }
+      var team_details_span = "<p>";
+      var player_exceeded = false;
+      for (const [key, value] of Object.entries(team_wise)){
+        team_details_span += `${key} - ${value}<br/>`;
+        if(value>MAX_PLAYERS_PER_TEAM){
+          
+          error_html = `Selected ${value} players from ${key}. Select only ${MAX_PLAYERS_PER_TEAM}`;
+          document.getElementById("player_errors").style.display = "block";
+          document.getElementById("player_errors").innerHTML = error_html
+          player_exceeded = true;
+          MAX_PLAYERS_PER_TEAM_ERROR = true;
+        } 
+      }
+      if(!player_exceeded){
+        document.getElementById("player_errors").innerHTML = ""
+        document.getElementById("player_errors").style.display = "none";
+        MAX_PLAYERS_PER_TEAM_ERROR = false;
+      }
+      team_details_span += ` Total players selected - ${selected_players.length}<br/>${MAX_PLAYERS - selected_players.length} more to go </p>`;
+      document.getElementById("team_details_span").innerHTML = team_details_span;
 
       var cap_options = "<option disabled selected value> -- select an option -- </option>"
       for(var i=0; i<selected_players.length; i++){
@@ -237,7 +277,7 @@
       }); 
         $('#selected_matches').each(function () {
           $(this).select2({
-            maximumSelectionLength: 3,
+            maximumSelectionLength: MAX_MATCHES,
             theme: 'bootstrap4',
             width: 'style',
             placeholder: $(this).attr('placeholder'),
@@ -246,7 +286,7 @@
         }); 
         $('#selected_players').each(function () {
           $(this).select2({
-            maximumSelectionLength: 13,
+            maximumSelectionLength: MAX_PLAYERS,
             theme: 'bootstrap4',
             width: 'style',
             placeholder: $(this).attr('placeholder'),
@@ -265,21 +305,22 @@
         var all_matches = document.getElementById('selected_matches')
         var matches = [...all_matches.options].filter(option => option.selected)
 
-        if(players.length != 13){
+        if(players.length != MAX_PLAYERS){
           document.getElementById("player_errors").style.display = "block";
-          document.getElementById("player_errors").innerHTML =`You have selected ${players.length}. Please select 13.`
-        } else {
-          document.getElementById("player_errors").style.display = "none";
+          document.getElementById("player_errors").innerHTML =`You have selected ${players.length}. Please select ${MAX_PLAYERS}.`
         }
+        else if(!MAX_PLAYERS_PER_TEAM_ERROR){
+          document.getElementById("player_errors").style.display = "none";
+        } 
 
-        if(matches.length != 3){
+        if(matches.length != MAX_MATCHES){
           document.getElementById("match_errors").style.display = "block";
-          document.getElementById("match_errors").innerHTML =`You have selected ${matches.length}. Please select 3.`
-        } else {
+          document.getElementById("match_errors").innerHTML =`You have selected ${matches.length}. Please select ${MAX_MATCHES}.`
+        } else if(!MAX_PLAYERS_PER_TEAM_ERROR) {
           document.getElementById("match_errors").style.display = "none";
         }
 
-        if(players.length == 13 && matches.length == 3){
+        if(players.length == MAX_PLAYERS && matches.length == MAX_MATCHES && !MAX_PLAYERS_PER_TEAM_ERROR){
           createTeamForm.submit();
         }
       });

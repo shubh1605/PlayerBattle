@@ -15,6 +15,7 @@ from core.models import Change, Match, Player, Variable
 from users.models import Profile
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
+from django.db.models import Count
 
 # Create your views here.
 
@@ -420,8 +421,14 @@ def edit_vice_captain(request):
 def create_team(request):
 	curr_user = request.user
 	prof = Profile.objects.get(user=curr_user)
-	all_players = Player.objects.all()
+	# all_teams = Player.objects.values('team_name').annotate(='player_name')
+	all_teams = [x['team_name'] for x in Player.objects.values('team_name').annotate(dcount=Count('team_name'))]
+	all_players = {}
+	for team in all_teams:
+		all_players[team] = Player.objects.filter(team_name=team)
+	# print(all_players)
 	matches = Match.objects.all()
+
 
 	if request.method == "POST":	
 		try:
@@ -461,15 +468,18 @@ def create_team(request):
 			
 	context = {
 		'user':curr_user,
-		'all_players':all_players,
 		'all_matches':matches,
+		'team_wise_players':all_players,
 	}
 	return render(request, 'core/create_team.html', context)
 
 
 
 def get_match_players(match_link):
-	player_src = requests.get("https://www.espncricinfo.com/series/icc-men-s-t20-world-cup-2022-23-1298134/"+match_link+"/match-playing-xi").text
+	# series_link = "indian-premier-league-2023-1345038"
+	# series_link = "icc-men-s-t20-world-cup-2022-23-1298134"
+	series_link = "pakistan-super-league-2022-23-1332128"
+	player_src = requests.get("https://www.espncricinfo.com/series/"+series_link+"/"+match_link+"/match-playing-xi").text
 	players_dict = {}
 	soup2 = BeautifulSoup(player_src, 'lxml')
 	players = soup2.find('table', class_ = 'ds-table')
@@ -489,7 +499,10 @@ def get_match_players(match_link):
 	return players_dict
 	
 def get_match_points(match_link, points):
-	source = requests.get("https://www.espncricinfo.com/series/icc-men-s-t20-world-cup-2022-23-1298134/"+match_link+"/full-scorecard").text
+	# series_link = "indian-premier-league-2023-1345038"
+	# series_link = "icc-men-s-t20-world-cup-2022-23-1298134"
+	series_link = "pakistan-super-league-2022-23-1332128"
+	source = requests.get("https://www.espncricinfo.com/series/"+series_link+"/"+match_link+"/full-scorecard").text
 	soup=BeautifulSoup(source,'lxml')
 
 	tables = soup.findAll("table",class_ = 'ds-w-full')

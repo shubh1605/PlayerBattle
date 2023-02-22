@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import requests	
+from models import Match
 
 # series_link = "indian-premier-league-2023-1345038"
 # series_link = "icc-men-s-t20-world-cup-2022-23-1298134"
@@ -16,9 +17,17 @@ all_matches_points = {}
 for match in matches_data:
     temp = match.find('div', class_ = "ds-flex").find('div', class_ = "ds-grow ds-px-4 ds-border-r ds-border-line-default-translucent").find('a').attrs['href']
     temp_list = temp.split('/')
+    # match_link = temp_list[3]
+    # match_name = " ".join(match_link.split("-")[:-3])
+    # new_m = Match()
+    # new_m.name = match_name
+    # new_m.link = temp_list[3]
+    # new_m.save()
+    # print(match_name)
+    
     matches_link.append(temp_list[3])
 
-print(matches_link)
+# print(matches_link)
 
 # all_players = []
 # for match in matches_link[0:1]:

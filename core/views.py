@@ -27,12 +27,16 @@ def start_match(request):
 			variable = Variable.objects.all()[0]
 			matches_completed = variable.number_of_match_completed
 			is_match_live = variable.is_any_match_live
+			
+			# print()
 			# if request.method == 'GET':
-			#     all_matches = Match.objects.all()
-			#     context = {
-			#         "all_matches": all_matches, 
-			#     }
-			#     return render(request, 'core/start_match.html', context)
+
+			# 	print(is_match_live)
+			# 	all_matches = Match.objects.all()
+			# 	context = {
+			# 		"is_any_match_live": is_match_live, 
+			# 	}
+			# 	return render(request, 'core/admin.html', context)
 			# else:
 			match_link = request.POST['match']
 			live_match = Match.objects.get(link=match_link)
@@ -63,7 +67,9 @@ def end_match(request):
 			#     }
 			#     return render(request, 'core/end_match.html', context)
 			# else:
-			match_link = request.POST['match']
+			match_link = request.POST['end_match']
+			result = request.POST['result']
+			
 			live_match = Match.objects.get(link=match_link)
 			live_match.is_live = False
 			player_dict = get_match_players(match_link)
@@ -90,7 +96,6 @@ def end_match(request):
 			# print(points)
 			# user_profiles =  Profile.objects.filter(user__in= User.objects.filter(is_active=True))
 			no_error = allot_points_to_user(points, live_match)
-			print("hi",no_error)
 			if no_error:
 				return HttpResponseRedirect(reverse('admin-func'))
 
@@ -202,6 +207,17 @@ def allot_bonus_points(request):
 		user.save()
 	return HttpResponseRedirect(reverse('admin-func'))
 
+def start_daily_match_prediction(request):
+	match = request.POST['daily_match']
+	variable = Variable.objects.all()[0]
+	req_match = Match.objects.get(id=match)
+	variable.daily_prediction.add(req_match)
+	variable.save()
+	print(match)
+	return HttpResponseRedirect(reverse('admin-func'))
+
+
+
 
 	
 
@@ -211,8 +227,33 @@ def home_page(request):
 	players = Player.objects.all().order_by('-total_points').values()
 	best_batsman = players.order_by('-bat_points').values()[0]
 	best_bowler = players.order_by('-bowl_points').values()[0]
-
 	is_match_live = Variable.objects.all()[0]
+	new_predictions = {}
+	if request.user:
+		logged_in_user = Profile.objects.get(user=request.user)
+		daily_prediction_match = Variable.objects.all()[0].daily_prediction.all()
+		user_predictions = json.loads(logged_in_user.daily_prediction)
+		new_predictions = {}
+		print(user_predictions.keys())
+		for match in daily_prediction_match:
+			match_id = match.id
+			new_predictions[match] = {}
+			# match = Match.objects.get(id=match_id)
+			if str(match_id) not in user_predictions.keys():
+				
+				new_predictions[match]['prediction'] = None
+				new_predictions[match]['result'] = match.name.split(" vs ")
+				new_predictions[match]['result'].append("tie")
+				print("if")
+				print(match_id)
+				print(new_predictions)
+			else:
+				print("else")
+				print(match_id)
+				print(new_predictions)
+				
+				new_predictions[match]['prediction'] = user_predictions[str(match_id)]
+		
 	
 
 	context = {
@@ -220,10 +261,40 @@ def home_page(request):
 		'players':players,
 		'best_batsman':best_batsman,
 		'best_bowler':best_bowler,
-		'is_match_live':is_match_live.match_live
+		'is_match_live':is_match_live.match_live,
+		'new_predictions':new_predictions
 	}
 	return render(request, 'core/home_page.html', context)
 
+def predict_results(request, id):
+	try:
+		if request.user:
+			if request.POST:
+				print(id)
+				predicted_result = request.POST['match_predict_'+str(id)]
+				user_profile = Profile.objects.get(user=request.user)
+				user_predictions = json.loads(user_profile.daily_prediction)
+				match = Match.objects.get(id=id)
+				if match not in user_predictions:
+					user_predictions[match.id] = str(predicted_result)
+					user_profile.daily_prediction = json.dumps(user_predictions)
+					# print(user_profile.daily_prediction)
+					user_profile.save()
+					message = f'Prediction saved!'
+					messages.success(request, message)
+				else:
+					message = f'Prediction already made!'
+					messages.error(request, message )
+				return redirect('home-page')
+		else:
+			message = f'Please log in to predict'
+			messages.error(request, message )
+			return redirect('home-page')
+	except Exception as e:
+		print(e)
+		message = f'Oops! An error occured, please try again.'
+		messages.error(request, message )
+		return redirect('home-page')
 def players_stats_view(request):
 	context = {}
 	all_players = Player.objects.all()
@@ -265,11 +336,20 @@ def calculate_players_stats_view(request):
 def admin_func(request):
 	remaining_matches = Match.objects.filter(has_completed = False, is_live = False)
 	matches_live = Match.objects.filter(is_live=True)
+	if matches_live:
+		matches_live = matches_live[0]
 	players = Player.objects.all()
+	results = []
+	if matches_live:
+		teams = matches_live.name.split(" vs ")
+		team1, team2 = teams[0], teams[1]
+		results = [team1,team2,"tie", "no result"]
+		
 	context = {
 		"remaining_matches": remaining_matches, 
-		"matches_live": matches_live,
+		"match_live": matches_live,
 		"players":players,
+		"results":results,
 	}
 
 	return render(request, 'core/admin.html', context)

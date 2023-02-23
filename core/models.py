@@ -7,7 +7,7 @@ from django.utils import timezone
 
 class Player(models.Model):
     name =  models.CharField(max_length = 250)
-    matches = models.ManyToManyField('Match')
+    matches = models.ManyToManyField('Match',blank=True, null=True)
     total_points = models.IntegerField(default=0,blank=True, null=True)
     bat_points = models.IntegerField(default=0,blank=True, null=True)
     bowl_points = models.IntegerField(default=0,blank=True, null=True)
@@ -19,7 +19,7 @@ class Player(models.Model):
 class Match(models.Model):
     name = models.CharField(max_length = 250)
     link = models.TextField()
-    players = models.ManyToManyField(Player)
+    players = models.ManyToManyField(Player,blank=True, null=True)
     points = JSONField()
     has_completed = models.BooleanField(default=False, blank=True, null=True)
     is_live = models.BooleanField(default=False, blank=True, null=True)
@@ -32,6 +32,7 @@ class Variable(models.Model):
     number_of_match_completed = models.IntegerField(default=0)
     is_any_match_live = models.BooleanField(default=False)
     match_live = models.ForeignKey(Match, blank=True, null=True, on_delete=models.CASCADE, related_name = 'live_match')
+    daily_prediction = models.ManyToManyField(Match, blank=True, null=True)
 
 class Change(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -15,6 +15,8 @@
       <marquee>A match is live, your points will be added once the match ends.</marquee>
     <hr class="marquee-hr"/>
   {% endif %}
+
+  
     
     <div class="message-div">
       {% for message in messages %}
@@ -142,6 +144,55 @@
                 </div>
               </div>
             </div>
+            {% endif %}
+
+
+            <!-- Daily Predictions -->
+            {% if request.user %}
+              {% for match, value in new_predictions.items %}
+                <div class="col-12">
+                  <div class="card recent-sales overflow-auto">
+                    <div class="card-body">
+                      <h5 class="card-title">{{ match.name|title }} <span>| Daily Prediction</span></h5>
+                        {% if value.prediction %}
+                        <form class="row g-3" action="{% url 'predict-results' match.id %}" method="POST"> 
+                          {% csrf_token %}                 
+                          <div class="col-md-12">
+                              <div class="form-floating mb-3">
+                                  <select class="form-select" id="floatingSelect" aria-label="State" name="match_predict_{{ match.id }}" required>                                   
+                                      <option value="{{value.prediction}}">{{ value.prediction|title }}</option>                                    
+                                  </select>
+                                  <label for="floatingSelect"> Predicted </label>
+                              </div>
+                          </div>  
+                          <div class="text-center">
+                            <button type="submit" disabled class="btn btn-primary">Predict</button>
+                          </div>   
+                        </form>
+                        {% else %}
+                          <form class="row g-3" action="{% url 'predict-results' match.id %}" method="POST"> 
+                            {% csrf_token %}                 
+                            <div class="col-md-12">
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" id="floatingSelect" aria-label="State" name="match_predict_{{ match.id }}" required>
+                                      <option disabled selected value> -- select an option -- </option>    
+                                      {% for result in value.result %}  
+                                        <option value="{{result}}">{{ result|title }}</option>  
+                                      {% endfor %}
+                                    </select>
+                                    <label for="floatingSelect"> Predict result</label>
+                                </div>
+                            </div>  
+                            <div class="text-center">
+                              <button type="submit" class="btn btn-primary">Predict</button>
+                            </div>   
+                          </form>
+                        {% endif %}
+                      
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
             {% endif %}
 
             <!-- Overall Player Points -->

@@ -32,7 +32,11 @@
                                 </div>
                             </div>                           
                             <div class="text-center">
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                                {% if match_live %}
+                                    <button type="submit" class="btn btn-primary" disabled>Submit</button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-primary" >Start match</button>
+                                {% endif %}
                             </div>
                         </form><!-- End floating Labels Form -->
                     </div>
@@ -41,23 +45,31 @@
             <div class="col-lg-6">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">End Match</h5>
-        
-                        <form class="row g-3" action="{% url 'end-match' %}" method="post"> 
-                            {% csrf_token %}                 
+                        <h5 class="card-title">End Match</h5>   
+                        <form class="row g-3" action="{% url 'end-match' %}" method="POST"> 
+                            {% csrf_token %}                                           
                             <div class="col-md-12">
                                 <div class="form-floating mb-3">
-                                    <select class="form-select" id="floatingSelect" aria-label="State" name="match" required>
-                                        {% for match in matches_live %}
-                                            <option value="{{match.link}}">{{ match.name }}</option>
-                                        {% endfor %}             
+                                    <select class="form-select" id="floatingSelect" aria-label="State" name="end_match" required>                                      
+                                        <option value="{{match_live.link}}">{{ match_live.name }}</option>   
                                     </select>
                                     <label for="floatingSelect">Match Name</label>
                                 </div>
-                            </div>                           
+                            </div>    
+                            <div class="col-md-12">
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" id="floatingSelect" aria-label="State" name="result" required>
+                                        <option disabled selected value> -- select an option -- </option>                                      
+                                        {% for result in results %}
+                                            <option value="{{result}}">{{ result|title }}</option>   
+                                        {% endfor %}
+                                    </select>
+                                    <label for="floatingSelect">Result</label>
+                                </div>
+                            </div>                                                   
                             <div class="text-center">
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </div>
+                                <button type="submit" class="btn btn-primary">Enter result and end match</button>
+                            </div>                     
                         </form><!-- End floating Labels Form -->
                     </div>
                 </div>
@@ -92,6 +104,29 @@
                                     <label for="floatingSelect">Purple Cap Winner</label>
                                 </div>
                             </div>                        
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Start daily prediction</h5>
+                        <form class="row g-3" action="{% url 'start-daily-match-prediction' %}" method="POST"> 
+                            {% csrf_token %}                 
+                            <div class="col-md-12">
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" id="floatingSelect" aria-label="State" name="daily_match" required>
+                                        {% for match in remaining_matches %}
+                                            <option value="{{match.id}}">{{ match.name|title }}</option>
+                                        {% endfor %}    
+                                    </select>
+                                    <label for="floatingSelect">Daily match prediction</label>
+                                </div>
+                            </div>                           
                             <div class="text-center">
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </div>

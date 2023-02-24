@@ -40,6 +40,7 @@ def start_match(request):
 			# else:
 			match_link = request.POST['match']
 			live_match = Match.objects.get(link=match_link)
+			variable.daily_prediction.remove(live_match)
 			live_match.is_live = True
 			live_match.save()
 			variable.is_any_match_live = True
@@ -60,18 +61,9 @@ def end_match(request):
 			variable = Variable.objects.all()[0]
 			matches_completed = variable.number_of_match_completed
 			is_match_live = variable.is_any_match_live
-			# if request.method == 'GET':
-			#     matches_live = Match.objects.filter(is_live=True)
-			#     context = {
-			#         "matches_live": matches_live, 
-			#     }
-			#     return render(request, 'core/end_match.html', context)
-			# else:
 			match_link = request.POST['end_match']
 			result = request.POST['result']
-			
 			live_match = Match.objects.get(link=match_link)
-			live_match.is_live = False
 			player_dict = get_match_players(match_link)
 			points = get_match_points(match_link, player_dict)
 			for player in points:
@@ -95,7 +87,7 @@ def end_match(request):
 					live_match.players.add(p)
 			# print(points)
 			# user_profiles =  Profile.objects.filter(user__in= User.objects.filter(is_active=True))
-			no_error = allot_points_to_user(points, live_match)
+			no_error = allot_points_to_user(points, live_match, result)
 			if no_error:
 				return HttpResponseRedirect(reverse('admin-func'))
 
@@ -105,11 +97,13 @@ def end_match(request):
 				user_profile.save()
 				i += 1
 
-			live_match.points = json.dumps(points)
-			live_match.has_completed = True
-			live_match.save()
 			variable.is_any_match_live = False
 			variable.match_live = None
+			
+			live_match.points = json.dumps(points)
+			live_match.has_completed = True
+			live_match.is_live = False
+			live_match.save()
 			variable.save()
 			return HttpResponseRedirect(reverse('admin-func'))
 			# variable[0].match_live
@@ -118,7 +112,7 @@ def end_match(request):
 	else:
 			return HttpResponse("Login")
 
-def allot_points_to_user(match_points, match):
+def allot_points_to_user(match_points, match, result):
 	user_profiles =  Profile.objects.filter(user__in= User.objects.filter(is_active=True))
 	for user_profile in user_profiles:		
 		try:
@@ -127,8 +121,9 @@ def allot_points_to_user(match_points, match):
 			user_total_points = user_profile.total_score
 			user_captain = user_profile.captain.name
 			user_vicecaptain = user_profile.vice_captain.name
+			user_predictions = json.loads(user_profile.daily_prediction)
+			user_prediction_score = user_profile.prediction_score
 			match_bonus = 1
-			total = []
 			user_points = json.loads(user_profile.points)
 			description = json.loads(user_profile.points_description)
 			description[match.name] = {}
@@ -137,21 +132,39 @@ def allot_points_to_user(match_points, match):
 			user_match_info['captain'] = user_captain
 			user_match_info['vice_captain'] = user_vicecaptain
 			user_match_info['match_id'] = match.id
-
+			match_id = match.id
+			total = [0.0,0.0,0.0]
+			user_match_info['match_prediction'] = 0
+			if str(match_id) in user_predictions.keys():
+				print("if")
+				if result == "no result":
+					print("no result")
+					user_prediction_score += 0
+					user_match_info['match_prediction'] = 0
+				elif result == user_predictions[str(match_id)] and result == "tie":
+					print("predicted tie")
+					user_prediction_score += 75
+					total[2] += 75.0
+					user_total_points += 75.0
+					user_match_info['match_prediction'] = 75.0
+				elif result == user_predictions[str(match_id)] and result != "tie":
+					print("not predicted tie")
+					user_prediction_score += 20
+					total[2] += 20.0
+					user_total_points += 20.0
+					user_match_info['match_prediction'] = 20.0
+			print(user_match_info)
+			user_profile.prediction_score = user_prediction_score
+				
 			if match in user_matches:
 				match_bonus = 2
 				user_match_info['is_match_bonus'] = True
 			else:
-				user_match_info['is_match_bonus'] = False
-
-			total = [0.0,0.0,0.0]
+				user_match_info['is_match_bonus'] = False			
 			
 			for player in user_players:
 				if(player.name in match_points):
-					# print(total)
-					
 					user_match_players[player.name] = [0.0,0.0,0.0]
-					print(user_match_players)
 					if player.name not in user_points:
 						user_points[player.name] = [0.0,0.0,0.0]
 					if(player.name == user_captain):
@@ -216,14 +229,8 @@ def start_daily_match_prediction(request):
 	print(match)
 	return HttpResponseRedirect(reverse('admin-func'))
 
-
-
-
-	
-
 def home_page(request):
 	users = Profile.objects.filter(user__in= User.objects.filter(is_active=True))
-	# print(Profile.objects.filter())
 	players = Player.objects.all().order_by('-total_points').values()
 	best_batsman = players.order_by('-bat_points').values()[0]
 	best_bowler = players.order_by('-bowl_points').values()[0]
@@ -234,7 +241,6 @@ def home_page(request):
 		daily_prediction_match = Variable.objects.all()[0].daily_prediction.all()
 		user_predictions = json.loads(logged_in_user.daily_prediction)
 		new_predictions = {}
-		print(user_predictions.keys())
 		for match in daily_prediction_match:
 			match_id = match.id
 			new_predictions[match] = {}
@@ -244,17 +250,8 @@ def home_page(request):
 				new_predictions[match]['prediction'] = None
 				new_predictions[match]['result'] = match.name.split(" vs ")
 				new_predictions[match]['result'].append("tie")
-				print("if")
-				print(match_id)
-				print(new_predictions)
-			else:
-				print("else")
-				print(match_id)
-				print(new_predictions)
-				
+			else:				
 				new_predictions[match]['prediction'] = user_predictions[str(match_id)]
-		
-	
 
 	context = {
 		'users':users,

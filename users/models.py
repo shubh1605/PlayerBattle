@@ -10,6 +10,7 @@ class Profile(models.Model):
     contact_no = models.TextField(null=False, blank=False)
     players = models.ManyToManyField(Player,null = True, blank = True)
     total_score = models.IntegerField(default=0)
+    prediction_score = models.IntegerField(default=0)
     captain = models.ForeignKey(Player, on_delete=models.CASCADE, related_name = 'captain',null = True, blank = True)
     vice_captain = models.ForeignKey(Player,on_delete=models.CASCADE, related_name='vice_captain',null = True, blank = True)
     matches = models.ManyToManyField(Match,null = True, blank = True)

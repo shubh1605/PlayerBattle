@@ -154,7 +154,13 @@
                             <td class="table-content">{{ points.1 }}</td>
                             <td class="table-content"><span>{{ points.2 }}</span></td>
                           </tr>
-                        {% endfor %}         
+                        {% endfor %}    
+                          <tr>
+                            <td class="table-content">Match Predictions</td>
+                            <td class="table-content">0</td>
+                            <td class="table-content">0</td>
+                            <td class="table-content">{{ profile_viewing.prediction_score }}</td>
+                          </tr>     
                       </tbody>
                     </table>
                   </div> 
@@ -235,11 +241,16 @@
                                     </tr> 
                                   {% endfor %}
                                     <tr>
+                                      <td class="table-content">Match Prediction</td>
+                                      <td class="table-content">0</td>
+                                      <td class="table-content">0</td>
+                                      <td class="table-content">{{ description.Info.match_prediction }}</td>
+                                    </tr>
+                                    <tr>
                                       <td class="table-content">Total</td>
                                       <td class="table-content">{{ description.Info.total.0 }}</td>
                                       <td class="table-content">{{ description.Info.total.1 }}</td>
                                       <td class="table-content">{{ description.Info.total.2 }}</td>
-                                      
                                     </tr>
                                 </tbody>
                               </table>

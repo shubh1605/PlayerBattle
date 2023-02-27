@@ -126,29 +126,30 @@ def allot_points_to_user(match_points, match, result):
 			match_bonus = 1
 			user_points = json.loads(user_profile.points)
 			description = json.loads(user_profile.points_description)
-			description[match.name] = {}
+			description[match.id] = {}
 			user_match_players = {}
 			user_match_info = {}
 			user_match_info['captain'] = user_captain
 			user_match_info['vice_captain'] = user_vicecaptain
 			user_match_info['match_id'] = match.id
+			user_match_info['matchName'] = match.name
 			match_id = match.id
 			total = [0.0,0.0,0.0]
 			user_match_info['match_prediction'] = 0
 			if str(match_id) in user_predictions.keys():
-				print("if")
+				# print("if")
 				if result == "no result":
-					print("no result")
+					# print("no result")
 					user_prediction_score += 0
 					user_match_info['match_prediction'] = 0
 				elif result == user_predictions[str(match_id)] and result == "tie":
-					print("predicted tie")
+					# print("predicted tie")
 					user_prediction_score += 75
 					total[2] += 75.0
 					user_total_points += 75.0
 					user_match_info['match_prediction'] = 75.0
 				elif result == user_predictions[str(match_id)] and result != "tie":
-					print("not predicted tie")
+					# print("not predicted tie")
 					user_prediction_score += 20
 					total[2] += 20.0
 					user_total_points += 20.0
@@ -188,8 +189,8 @@ def allot_points_to_user(match_points, match, result):
 							user_match_players[player.name][i] = (match_points[player.name][i] * match_bonus)
 			
 			user_match_info['total'] = total
-			description[match.name]['Players'] = user_match_players
-			description[match.name]['Info'] = user_match_info
+			description[match.id]['Players'] = user_match_players
+			description[match.id]['Info'] = user_match_info
 			user_profile.points_description = json.dumps(description)
 			user_profile.total_score = user_total_points
 			user_profile.points = json.dumps(user_points)
@@ -375,6 +376,7 @@ def login_user(request):
 		password = request.POST['password']		
 
 		user = authenticate(username=username,password=password)
+		print(user)
 		# print(username+" "+password)
 
 		if user is not None:
@@ -388,7 +390,7 @@ def login_user(request):
 				messages.error(request, message)
 				return redirect ("login")
 		else:
-			message = "Your account has not been activated. Please wait for you account to be activated by the admin!	"
+			message = "Invalid credentials or wait for your account to be activated by the admin!	"
 			messages.error(request, message )
 			return redirect('login')
 			
@@ -406,8 +408,8 @@ def register(request):
 		existing_user = User.objects.filter(email=email)
 
 		if password1 == password2:
-			new_user = User.objects.create_user(first_name=first_name,last_name=last_name,email=email,username=username,password=password1,is_active=False)
 			try: 
+				new_user = User.objects.create_user(first_name=first_name,last_name=last_name,email=email,username=username,password=password1,is_active=False)
 				new_user.save()
 				messages.success(request, "Profile created!" )
 				return redirect("login")
@@ -531,7 +533,7 @@ def edit_vice_captain(request):
 
 def create_team(request):
 	variable = Variable.objects.all()[0]
-	if not request.user.is_anonymous and variable.enable_create_team:
+	if (not request.user.is_anonymous) and variable.enable_create_team:
 		curr_user = request.user
 		prof = Profile.objects.get(user=curr_user)
 		# all_teams = Player.objects.values('team_name').annotate(='player_name')
@@ -541,6 +543,30 @@ def create_team(request):
 			all_players[team] = Player.objects.filter(team_name=team)
 		# print(all_players)
 		matches = Match.objects.all()
+		context = {}
+		if request.method == "GET":
+			curr_user = request.user
+			prof = Profile.objects.get(user=curr_user)
+			# print(prof.players.all())
+			selected_players = [int(player.id) for player in prof.players.all()]
+			selected_matches = [int(match.id) for match in prof.matches.all()]
+			selected_orange_cap = int(prof.orange_cap.id) if prof.orange_cap else ""
+			selected_purple_cap = int(prof.purple_cap.id) if prof.purple_cap else ""
+			selected_captain = int(prof.captain.id) if prof.captain else ""
+			selected_vice_captain = int(prof.vice_captain.id) if prof.vice_captain else ""
+
+			context = {
+				'user':curr_user,
+				'all_matches':matches,
+				'team_wise_players':all_players,
+				'selected_players': selected_players,
+				'selected_captain': selected_captain,
+				'selected_vice_captain': selected_vice_captain,
+				'selected_matches': selected_matches,
+				'selected_orange_cap': selected_orange_cap,
+				'selected_purple_cap': selected_purple_cap,
+			}
+			return render(request, 'core/create_team.html', context)
 		if request.method == "POST":	
 			try:
 				user_points = {}	
@@ -574,12 +600,12 @@ def create_team(request):
 			except:
 				message = f'An error occured! Please try again.'
 				messages.error(request, message )		
-		context = {
-			'user':curr_user,
-			'all_matches':matches,
-			'team_wise_players':all_players,
-		}
-		return render(request, 'core/create_team.html', context)
+			context = {
+				'user':curr_user,
+				'all_matches':matches,
+				'team_wise_players':all_players,
+			}
+			return redirect('create-team')
 	else:
 		message = f'Oops, An error occured'
 		messages.error(request, message )

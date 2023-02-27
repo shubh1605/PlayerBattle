@@ -178,7 +178,7 @@
                       <tbody>
                          {% for match in profile_viewing_matches %}
                           <tr>
-                            <td class="table-content">1</td>
+                            <td class="table-content">{{ forloop.counter }}</td>
                             <td class="table-content">{{ match.name|title }}</td>
                             <td class="table-content"></td>
                             {% if match.has_completed %}
@@ -203,7 +203,7 @@
                           <h2 class="accordion-header" id="flush-headingOne">
                             <button class="acc-btn accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#match{{ description.Info.match_id }}" aria-expanded="false" aria-controls="flush-collapseOne">
                                 <span style="margin-right:10px;"> 
-                                  {{ match|title }} 
+                                  {{ description.Info.matchName|title }} 
                                   {% if description.Info.is_match_bonus %}
                                     <span class="badge bg-success">BM</span>
                                   {% endif %}
@@ -272,9 +272,9 @@
                           {% for player in profile_viewing_players %}
                             {% if player != profile_viewing_vice_cap %}
                               {% if player == profile_viewing_cap %}
-                                <option value="{{ player.id }}" selected>{{ player.name }}</option>
+                                <option value="{{ player.id }}" selected>{{ player.name|title }}</option>
                               {% else %}
-                                <option value="{{ player.id }}">{{ player.name }}</option>
+                                <option value="{{ player.id }}">{{ player.name|title }}</option>
                               {% endif %}
                             {% endif %}
                           {% endfor %}     
@@ -310,9 +310,9 @@
                           {% for player in profile_viewing_players %}
                             {% if player != profile_viewing_cap %}
                               {% if player == profile_viewing_vice_cap %}
-                                <option value="{{ player.id }}" selected>{{ player.name }}</option>
+                                <option value="{{ player.id }}" selected>{{ player.name|title }}</option>
                               {% else %}
-                                <option value="{{ player.id }}">{{ player.name }}</option>
+                                <option value="{{ player.id }}">{{ player.name|title }}</option>
                               {% endif %}
                             {% endif %}
                           {% endfor %}     

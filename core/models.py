@@ -33,6 +33,9 @@ class Variable(models.Model):
     is_any_match_live = models.BooleanField(default=False)
     match_live = models.ForeignKey(Match, blank=True, null=True, on_delete=models.CASCADE, related_name = 'live_match')
     daily_prediction = models.ManyToManyField(Match, blank=True, null=True)
+    enable_create_team = models.BooleanField(default=False)
+    enable_view_other_profile = models.BooleanField(default=False)
+    
 
 class Change(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

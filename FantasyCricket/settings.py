@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-t8*d%^+*g39pr6#cu30iwy@wy&m6hxa%dxe)_v*+lh6(q3b#0x'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["playerbattle.pythonanywhere.com","127.0.0.1"]
 

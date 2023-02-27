@@ -86,13 +86,13 @@ def end_match(request):
 					p.save()
 					live_match.players.add(p)
 			# print(points)
-			# user_profiles =  Profile.objects.filter(user__in= User.objects.filter(is_active=True))
+			user_profiles =  Profile.objects.filter(user__in= User.objects.filter(is_active=True)).order_by('-total_score')
 			no_error = allot_points_to_user(points, live_match, result)
 			if no_error:
 				return HttpResponseRedirect(reverse('admin-func'))
 
 			i = 1
-			for user_profile in Profile.objects.order_by('-total_score'):
+			for user_profile in user_profiles:
 				user_profile.rank = i
 				user_profile.save()
 				i += 1
@@ -153,7 +153,7 @@ def allot_points_to_user(match_points, match, result):
 					total[2] += 20.0
 					user_total_points += 20.0
 					user_match_info['match_prediction'] = 20.0
-			print(user_match_info)
+			# print(user_match_info)
 			user_profile.prediction_score = user_prediction_score
 				
 			if match in user_matches:
@@ -236,7 +236,8 @@ def home_page(request):
 	best_bowler = players.order_by('-bowl_points').values()[0]
 	is_match_live = Variable.objects.all()[0]
 	new_predictions = {}
-	if request.user:
+	
+	if not request.user.is_anonymous:
 		logged_in_user = Profile.objects.get(user=request.user)
 		daily_prediction_match = Variable.objects.all()[0].daily_prediction.all()
 		user_predictions = json.loads(logged_in_user.daily_prediction)
@@ -265,7 +266,7 @@ def home_page(request):
 
 def predict_results(request, id):
 	try:
-		if request.user:
+		if not request.user.is_anonymous:
 			if request.POST:
 				print(id)
 				predicted_result = request.POST['match_predict_'+str(id)]
@@ -331,25 +332,36 @@ def calculate_players_stats_view(request):
 	return JsonResponse(json.dumps(player_stat),safe=False)
 
 def admin_func(request):
-	remaining_matches = Match.objects.filter(has_completed = False, is_live = False)
-	matches_live = Match.objects.filter(is_live=True)
-	if matches_live:
-		matches_live = matches_live[0]
-	players = Player.objects.all()
-	results = []
-	if matches_live:
-		teams = matches_live.name.split(" vs ")
-		team1, team2 = teams[0], teams[1]
-		results = [team1,team2,"tie", "no result"]
-		
-	context = {
-		"remaining_matches": remaining_matches, 
-		"match_live": matches_live,
-		"players":players,
-		"results":results,
-	}
-
-	return render(request, 'core/admin.html', context)
+	# print("hi",request.user)
+	if not request.user.is_anonymous:
+		if request.user.is_superuser:
+			remaining_matches = Match.objects.filter(has_completed = False, is_live = False)
+			matches_live = Match.objects.filter(is_live=True)
+			if matches_live:
+				matches_live = matches_live[0]
+			players = Player.objects.all()
+			results = []
+			if matches_live:
+				teams = matches_live.name.split(" vs ")
+				team1, team2 = teams[0], teams[1]
+				results = [team1,team2,"tie", "no result"]
+				
+			context = {
+				"remaining_matches": remaining_matches, 
+				"match_live": matches_live,
+				"players":players,
+				"results":results,
+			}
+			return render(request, 'core/admin.html', context)
+		else:
+			message = f'Oops! An error occured.'
+			messages.error(request, message )
+			return redirect('home-page')
+	else:
+		message = f'Oops! An error occured.'
+		messages.error(request, message )
+		return redirect('home-page')
+	
 
 def logout_view(request):
 	logout(request)
@@ -419,6 +431,12 @@ def profile(request, id):
 	viewing_another_prof = True
 	if logged_in_user == profile_viewing_user:
 		viewing_another_prof = False
+	else:
+		variable = Variable.objects.all()[0]
+		if not variable.enable_view_other_profile:
+			message = f'Oops, An error occured'
+			messages.error(request, message )
+			return redirect('home-page')
 
 	prof_viewing = Profile.objects.get(user=profile_viewing_user)
 	profile_viewing_player_points = json.loads(prof_viewing.points)
@@ -461,101 +479,111 @@ def search_user(request):
 		
 
 def edit_captain(request):
-	
-	new_cap_id = request.POST['captain']
-	new_cap = Player.objects.get(id=new_cap_id)
-	prof = Profile.objects.get(user=request.user)
-	if prof.captain_changes != 0:
-		new_change = Change()
-		new_change.user = request.user
-		new_change.description = f'captain changed from {prof.captain} to {new_cap}'
-		prof.captain = new_cap
-		prof.captain_changes -= 1
-		message = f'Changes made!'
-		messages.success(request, message )
-		prof.save()
-		new_change.save()
-		
-		return redirect('profile', id=request.user.id)
+	if not request.user.is_anonymous:
+		new_cap_id = request.POST['captain']
+		new_cap = Player.objects.get(id=new_cap_id)
+		prof = Profile.objects.get(user=request.user)
+		if prof.captain_changes != 0:
+			new_change = Change()
+			new_change.user = request.user
+			new_change.description = f'captain changed from {prof.captain} to {new_cap}'
+			prof.captain = new_cap
+			prof.captain_changes -= 1
+			message = f'Changes made!'
+			messages.success(request, message )
+			prof.save()
+			new_change.save()
+			
+			return redirect('profile', id=request.user.id)
+		else:
+			message = f'No more changes can be made!'
+			messages.error(request, message )
+			return redirect('profile', id=request.user.id)
 	else:
-		message = f'No more changes can be made!'
-		messages.error(request, message )
-		return redirect('profile', id=request.user.id)
+			message = f'Oops, An error occured'
+			messages.error(request, message )
+			return redirect('home-page')
 
 def edit_vice_captain(request):
-	new_vice_cap_id = request.POST['vice_captain']	
-	new_vice_cap = Player.objects.get(id=new_vice_cap_id)
-	prof = Profile.objects.get(user=request.user)
-	if prof.vice_captain_changes != 0:
-		new_change = Change()
-		new_change.user = request.user
-		new_change.description = f'captain changed from {prof.vice_captain} to {new_vice_cap}'
-		prof.vice_captain = new_vice_cap
-		prof.vice_captain_changes -= 1
-		prof.save()
-		new_change.save()
-		message = f'Changes made!'
-		messages.success(request, message )
-		return redirect('profile', id=request.user.id)
+	if not request.user.is_anonymous:
+		new_vice_cap_id = request.POST['vice_captain']	
+		new_vice_cap = Player.objects.get(id=new_vice_cap_id)
+		prof = Profile.objects.get(user=request.user)
+		if prof.vice_captain_changes != 0:
+			new_change = Change()
+			new_change.user = request.user
+			new_change.description = f'captain changed from {prof.vice_captain} to {new_vice_cap}'
+			prof.vice_captain = new_vice_cap
+			prof.vice_captain_changes -= 1
+			prof.save()
+			new_change.save()
+			message = f'Changes made!'
+			messages.success(request, message )
+			return redirect('profile', id=request.user.id)
+		else:
+			message = f'No more changes can be made!'
+			messages.error(request, message )
+			return redirect('profile', id=request.user.id)
 	else:
-		message = f'No more changes can be made!'
-		messages.error(request, message )
-		return redirect('profile', id=request.user.id)
+			message = f'Oops, An error occured'
+			messages.error(request, message )
+			return redirect('home-page')
 
 def create_team(request):
-	curr_user = request.user
-	prof = Profile.objects.get(user=curr_user)
-	# all_teams = Player.objects.values('team_name').annotate(='player_name')
-	all_teams = [x['team_name'] for x in Player.objects.values('team_name').annotate(dcount=Count('team_name'))]
-	all_players = {}
-	for team in all_teams:
-		all_players[team] = Player.objects.filter(team_name=team)
-	# print(all_players)
-	matches = Match.objects.all()
+	variable = Variable.objects.all()[0]
+	if not request.user.is_anonymous and variable.enable_create_team:
+		curr_user = request.user
+		prof = Profile.objects.get(user=curr_user)
+		# all_teams = Player.objects.values('team_name').annotate(='player_name')
+		all_teams = [x['team_name'] for x in Player.objects.values('team_name').annotate(dcount=Count('team_name'))]
+		all_players = {}
+		for team in all_teams:
+			all_players[team] = Player.objects.filter(team_name=team)
+		# print(all_players)
+		matches = Match.objects.all()
+		if request.method == "POST":	
+			try:
+				user_points = {}	
+				players = request.POST.getlist('players')
+				captain = request.POST['captain']
+				vice_captain = request.POST['vice_captain']
+				matches = request.POST.getlist('matches')
+				orange_cap = request.POST['orange_cap']
+				purple_cap = request.POST['purple_cap']
 
+				prof.orange_cap = Player.objects.get(id=orange_cap)
+				prof.purple_cap = Player.objects.get(id=purple_cap)
+				prof.captain = Player.objects.get(id=captain)
+				prof.vice_captain = Player.objects.get(id = vice_captain)
 
-	if request.method == "POST":	
-		try:
-			user_points = {}	
-			players = request.POST.getlist('players')
-			captain = request.POST['captain']
-			vice_captain = request.POST['vice_captain']
-			matches = request.POST.getlist('matches')
-			orange_cap = request.POST['orange_cap']
-			purple_cap = request.POST['purple_cap']
-
-			prof.orange_cap = Player.objects.get(id=orange_cap)
-			prof.purple_cap = Player.objects.get(id=purple_cap)
-			prof.captain = Player.objects.get(id=captain)
-			prof.vice_captain = Player.objects.get(id = vice_captain)
-
-			prof.players.clear()
-			for pid in players:
-				player = Player.objects.get(id=pid)
-				prof.players.add(player)
-				user_points[player.name] = [0.0,0.0,0.0]
-			
-			prof.matches.clear()
-			for mid in matches:
-				match = Match.objects.get(id=mid)
-				prof.matches.add(match)
-			
-			prof.points = json.dumps(user_points)	
-			prof.save()
-			message = f'Your team has been successfully created!'
-			messages.success(request, message)
-		except:
-			message = f'An error occured! Please try again.'
-			messages.error(request, message )
-
-
-			
-	context = {
-		'user':curr_user,
-		'all_matches':matches,
-		'team_wise_players':all_players,
-	}
-	return render(request, 'core/create_team.html', context)
+				prof.players.clear()
+				for pid in players:
+					player = Player.objects.get(id=pid)
+					prof.players.add(player)
+					user_points[player.name] = [0.0,0.0,0.0]
+				
+				prof.matches.clear()
+				for mid in matches:
+					match = Match.objects.get(id=mid)
+					prof.matches.add(match)
+				
+				prof.points = json.dumps(user_points)	
+				prof.save()
+				message = f'Your team has been successfully created!'
+				messages.success(request, message)
+			except:
+				message = f'An error occured! Please try again.'
+				messages.error(request, message )		
+		context = {
+			'user':curr_user,
+			'all_matches':matches,
+			'team_wise_players':all_players,
+		}
+		return render(request, 'core/create_team.html', context)
+	else:
+		message = f'Oops, An error occured'
+		messages.error(request, message )
+		return redirect('home-page')
 
 
 

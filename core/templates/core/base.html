@@ -109,7 +109,6 @@
             <li>
               <hr class="dropdown-divider">
             </li>
-
             <li>
               <hr class="dropdown-divider">
             </li>
@@ -122,9 +121,9 @@
             </li>
 
             <li>
-              <div class="dropdown-item d-flex align-items-center">
+              <div class="dropdown-item d-flex align-items-center" id="logout-btn">
                 <i class="bi bi-box-arrow-right"></i>
-                <span id="logout-btn">Sign Out</span>
+                <span >Sign Out</span>
               </div>
             </li>
 
@@ -163,19 +162,23 @@
           </a>
         </li><!-- End Profile Page Nav -->
 
-        <li class="nav-item">
-          <a class="nav-link {% if request.path != create_team_url %}collapsed{% endif %}" href="{% url 'create-team' %}">
-            <i class="bi bi-person"></i>
-            <span>Create Team</span>
-          </a>
-        </li><!-- End Profile Page Nav -->
+        {% if enable_create_team %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.path != create_team_url %}collapsed{% endif %}" href="{% url 'create-team' %}">
+              <i class="bi bi-person"></i>
+              <span>Create Team </span>
+            </a>
+          </li><!-- End Profile Page Nav -->
+        {% endif %}
       
-        <li class="nav-item">
-          <a class="nav-link {% if request.path != admin_url %}collapsed{% endif %}" href="{% url 'admin-func' %}">
-            <i class="bi bi-person"></i>
-            <span>Admin Roles</span>
-          </a>
-        </li>
+        {% if request.user.is_superuser %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.path != admin_url %}collapsed{% endif %}" href="{% url 'admin-func' %}">
+              <i class="bi bi-person"></i>
+              <span>Admin Roles</span>
+            </a>
+          </li>
+        {% endif %}
 
       {% else %}
 

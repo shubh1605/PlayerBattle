@@ -20,6 +20,6 @@ from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('core/', include('core.urls')),
+    path('', include('core.urls')),
     # path('add_players/', add_all_players_match_wise),
 ] +  static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

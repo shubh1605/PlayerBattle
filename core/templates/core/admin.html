@@ -25,7 +25,7 @@
                                 <div class="form-floating mb-3">
                                     <select class="form-select" id="floatingSelect" aria-label="State" name="match" required>
                                         {% for match in remaining_matches %}
-                                            <option value="{{match.link}}">{{ match.name }}</option>
+                                            <option value="{{match.link}}">{{ match.name|title }}</option>
                                         {% endfor %}    
                                     </select>
                                     <label for="floatingSelect">Match Name</label>

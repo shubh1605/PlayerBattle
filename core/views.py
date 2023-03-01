@@ -269,7 +269,6 @@ def predict_results(request, id):
 	try:
 		if not request.user.is_anonymous:
 			if request.POST:
-				print(id)
 				predicted_result = request.POST['match_predict_'+str(id)]
 				user_profile = Profile.objects.get(user=request.user)
 				user_predictions = json.loads(user_profile.daily_prediction)
@@ -333,7 +332,6 @@ def calculate_players_stats_view(request):
 	return JsonResponse(json.dumps(player_stat),safe=False)
 
 def admin_func(request):
-	# print("hi",request.user)
 	if not request.user.is_anonymous:
 		if request.user.is_superuser:
 			remaining_matches = Match.objects.filter(has_completed = False, is_live = False)
@@ -376,9 +374,7 @@ def login_user(request):
 		password = request.POST['password']		
 
 		user = authenticate(username=username,password=password)
-		print(user)
-		# print(username+" "+password)
-
+	
 		if user is not None:
 			if user.is_active:
 				login(request, user)
@@ -436,7 +432,7 @@ def profile(request, id):
 	else:
 		variable = Variable.objects.all()[0]
 		if not variable.enable_view_other_profile:
-			message = f'Oops, An error occured'
+			message = f'Other profiles cannot be viewed yet'
 			messages.error(request, message )
 			return redirect('home-page')
 
@@ -464,6 +460,195 @@ def profile(request, id):
 		'points_description':points_description,
 	}
 	return render(request, 'core/profile.html', context)
+
+def compare_teams(request):
+	variable = Variable.objects.all()[0]
+	if not variable.enable_view_other_profile:
+		message = f'Other profiles cannot be viewed yet'
+		messages.error(request, message )
+		return redirect('home-page')
+	else:
+		if request.method == "GET":
+			all_users = Profile.objects.filter(user__in= User.objects.filter(is_active=True))
+			context = {
+				"all_users": all_users,
+			}
+			return render(request, 'core/compare_teams.html', context)
+		
+		if request.method == "POST":
+			all_users = Profile.objects.filter(user__in= User.objects.filter(is_active=True))
+			user1_id = request.POST['team1']
+			user2_id = request.POST['team2']
+			user1 = User.objects.get(id=user1_id)
+			user2 = User.objects.get(id=user2_id)
+			prof1 = Profile.objects.get(user = user1)
+			prof2 = Profile.objects.get(user = user2)
+
+			prof1_players = prof1.players.all()
+			prof1_captain = prof1.captain
+			prof1_vice_captain = prof1.vice_captain
+			prof1_matches = prof1.matches.all()
+			prof1_points = json.loads(prof1.points)
+
+			prof2_players = prof2.players.all()
+			prof2_captain = prof2.captain
+			prof2_vice_captain = prof2.vice_captain
+			prof2_matches = prof2.matches.all()
+			prof2_points = json.loads(prof2.points)
+			
+			similar_players = {}
+			similar_players["team1"] = {}
+			similar_players["team2"] = {}
+			similar_players["info"] = {}
+
+			different_players = {}
+			different_players["team1"] = {}
+			different_players["team2"] = {}
+			different_players["info"] = {}
+
+			cap_players = {}
+			cap_players["team1"] = {}
+			cap_players["team2"] = {}
+			cap_players["info"] = {}
+
+			same_t1 = {}
+			same_t2 = {}
+			same_total1 = 0
+			same_total2 = 0
+			same_info = {}
+
+			diff_t1 = {}
+			diff_t2 = {}
+			diff_total1 = 0
+			diff_total2 = 0
+			diff_info = {}
+
+			caps_t1 = {}
+			caps_t2 = {}
+			caps_total1 = 0
+			caps_total2 = 0
+			caps_info = {}
+
+			for player in prof1_players:
+				if player != prof1_captain and player != prof1_vice_captain and player != prof2_captain and player != prof2_vice_captain:
+					if(player in prof2_players):
+						same_t1[player.name] = prof1_points[player.name][2]						
+						same_t2[player.name] = prof2_points[player.name][2]						
+						same_total1 += int(prof1_points[player.name][2])
+						same_total2 += int(prof2_points[player.name][2])
+					else:
+						diff_t1[player.name] = prof1_points[player.name][2]
+						diff_total1 += int(prof1_points[player.name][2])
+
+			if prof1.captain == prof2.captain:
+				player = prof1.captain
+				same_t1[player.name+" (c) "] = prof1_points[player.name][2]						
+				same_t2[player.name+" (c) "] = prof2_points[player.name][2]						
+				same_total1 += int(prof1_points[player.name][2])
+				same_total2 += int(prof2_points[player.name][2])
+			else:
+				caps_t1['captain'] = [prof1_captain.name, prof1_points[prof1_captain.name][2]]
+				caps_total1 += int(prof1_points[prof1_captain.name][2])
+				caps_t2['captain'] = [prof2_captain.name, prof2_points[prof2_captain.name][2]]
+				caps_total2 += int(prof2_points[prof2_captain.name][2])
+
+				if prof1_captain != prof2_vice_captain and prof1_captain in prof2_players:
+					player = prof1_captain
+					diff_t2[player.name] = prof2_points[player.name][2]
+					diff_total2 += int(prof2_points[player.name][2])
+				
+				if prof2_captain != prof1_vice_captain and prof2_captain in prof1_players:
+					player = prof2_captain
+					diff_t1[player.name] = prof1_points[player.name][2]
+					diff_total1 += int(prof1_points[player.name][2])
+
+			if prof1.vice_captain == prof2.vice_captain:
+				player = prof1.vice_captain
+				same_t1[player.name+" (vc) "] = prof1_points[player.name][2]						
+				same_t2[player.name+" (vc) "] = prof2_points[player.name][2]						
+				same_total1 += int(prof1_points[player.name][2])
+				same_total2 += int(prof2_points[player.name][2])
+			else:
+				caps_t1['vice_captain'] = [prof1_vice_captain.name, prof1_points[prof1_vice_captain.name][2]]
+				caps_total1 += int(prof1_points[prof1_vice_captain.name][2])
+				caps_t2['vice_captain'] = [prof2_vice_captain.name, prof2_points[prof2_vice_captain.name][2]]
+				caps_total2 += int(prof2_points[prof2_vice_captain.name][2])
+
+				if prof1_vice_captain != prof2_captain and prof1_vice_captain in prof2_players:
+					player = prof1_vice_captain
+					diff_t2[player.name] = prof2_points[player.name][2]
+					diff_total2 += int(prof2_points[player.name][2])
+				
+				if prof2_vice_captain != prof1_captain and prof2_vice_captain in prof1_players:
+					player = prof2_vice_captain
+					diff_t1[player.name] = prof1_points[player.name][2]
+					diff_total1 += int(prof1_points[player.name][2])
+
+
+			same_info['total1'] = same_total1
+			same_info['total2'] = same_total2
+			if same_total1 > same_total2:
+				same_info['result'] = prof1.user.username
+				same_info['difference'] = same_total1 - same_total2
+			elif same_total2 > same_total1:
+				same_info['result'] = prof2.user.username
+				same_info['difference'] = same_total2 - same_total1
+			else:
+				same_info['result'] = "Equal points"
+				same_info['difference'] = 0.0
+			
+			similar_players["team1"] = same_t1
+			similar_players["team2"] = same_t2
+			similar_players["info"] = same_info
+			
+			for player in prof2_players:
+				if player != prof1_captain and player != prof1_vice_captain and player != prof2_captain and player != prof2_vice_captain:
+					if(player not in prof1_players):
+						diff_t2[player.name] = prof2_points[player.name][2]
+						diff_total2 += int(prof2_points[player.name][2])
+
+			diff_info['total1'] = diff_total1
+			diff_info['total2'] = diff_total2
+			if diff_total1 > diff_total2:
+				diff_info['result'] = prof1.user.username
+				diff_info['difference'] = diff_total1 - diff_total2
+			elif diff_total2 > diff_total1:
+				diff_info['result'] = prof2.user.username
+				diff_info['difference'] = diff_total2 - diff_total1
+			else:
+				diff_info['result'] = "Equal points"
+				diff_info['difference'] = 0.0
+			
+			different_players["team1"] = diff_t1
+			different_players["team2"] = diff_t2
+			different_players["info"] = diff_info
+
+			caps_info['total1'] = caps_total1
+			caps_info['total2'] = caps_total2
+			if caps_total1 > caps_total2:
+				caps_info['result'] = prof1.user.username
+				caps_info['difference'] = caps_total1 - caps_total2
+			elif caps_total2 > caps_total1:
+				caps_info['result'] = prof2.user.username
+				caps_info['difference'] = caps_total2 - caps_total1
+			else:
+				caps_info['result'] = "Equal points"
+				caps_info['difference'] = 0.0
+
+			cap_players['info'] = caps_info
+			cap_players['team1'] = caps_t1
+			cap_players['team2'] = caps_t2
+
+			context = {
+				'similar_players': similar_players,
+				'different_players': different_players,
+				'cap_players': cap_players,
+				'all_users': all_users,
+				'user1': user1.username,
+				'user2': user2.username,
+			}
+			   
+			return render(request, 'core/compare_teams.html', context)
 
 def search_user(request):
 	try:
@@ -605,7 +790,7 @@ def create_team(request):
 				'all_matches':matches,
 				'team_wise_players':all_players,
 			}
-			return redirect('create-team')
+			return render(request, 'core/create_team.html', context)
 	else:
 		message = f'Oops, An error occured'
 		messages.error(request, message )

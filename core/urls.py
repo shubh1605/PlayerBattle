@@ -12,6 +12,7 @@ urlpatterns = [
     path('register/', register, name = 'register'),
     path('logout/', logout_view, name = 'logout'),
     path('profile/<id>/', profile, name='profile'),
+    path('compare-teams', compare_teams, name='compare-teams'),
     path('create-team/', create_team, name='create-team'),
     path('custom-admin/',admin_func, name='admin-func'),
     path('custom-admin/startmatch/', start_match, name='start-match'),

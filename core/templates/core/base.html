@@ -4,6 +4,7 @@
 {% url 'create-team' as create_team_url %}
 {% url 'admin-func' as admin_url %}
 {% url 'player-stats' as player_url %}
+{% url 'compare-teams' as compare_teams %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -159,6 +160,13 @@
           <a class="nav-link {% if request.path != profile_url %}collapsed{% endif %}" href="{% url 'profile' request.user.id %}">
             <i class="bi bi-person"></i>
               <span>Profile</span>
+          </a>
+        </li><!-- End Profile Page Nav -->
+
+        <li class="nav-item">
+          <a class="nav-link {% if request.path != compare_teams %}collapsed{% endif %}" href="{% url 'compare-teams' %}">
+            <i class="bi bi-person"></i>
+              <span>Compare Teams</span>
           </a>
         </li><!-- End Profile Page Nav -->
 

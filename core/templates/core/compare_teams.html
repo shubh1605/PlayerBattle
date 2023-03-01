@@ -1,0 +1,296 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block style %}
+<link href="{% static 'core/assets/css/compare_teams.css' %}" rel="stylesheet">
+<style>
+    button.acc-btn {
+      /* create a grid */
+      display: grid;
+      grid-template-columns: 1fr max-content max-content;
+      align-items: center;
+      grid-gap: 10px;
+    }
+  </style>  
+{% endblock %}
+
+{% block content %}
+    <main id="main" class="main">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Compare teams</h5>
+                        <form class="row g-3" id="select_users"  method="POST" action="{% url 'compare-teams' %}"> 
+                            {% csrf_token %}                 
+                            <div class="col-md-12">
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" id="floatingSelect" aria-label="State" name="team1" required>
+                                        {% for user in all_users %}
+                                            {% if user.user.username == user1 %}
+                                                <option value="{{user.user.id}}" selected>{{ user.user.username|title }}</option>
+                                            {% else %}
+                                                <option value="{{user.user.id}}">{{ user.user.username|title }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                    <label for="floatingSelect">Team 1</label>
+                                </div>
+                            </div>  
+                            <div class="col-md-12">
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" id="floatingSelect" aria-label="State" name="team2" required>
+                                        {% for user in all_users %}
+                                            {% if user.user.username == user2 %}
+                                                <option value="{{user.user.id}}" selected>{{ user.user.username|title }}</option>
+                                            {% else %}
+                                                <option value="{{user.user.id}}">{{ user.user.username|title }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                    <label for="floatingSelect">Team 2</label>
+                                </div>
+                            </div>                         
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Compare Teams</h5>                        
+                        <div class="accordion" id="accordionFlushExample">
+                            {% if similar_players %}
+                                <div class="accordion-item">
+                                  <h2 class="accordion-header" id="flush-headingOne">
+                                    <button class="accordion-button acc-btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#similar_players" aria-expanded="false" aria-controls="flush-collapseOne">
+                                      Similar Players
+                                      <span class="status">
+                                        {% if similar_players.info.result != "Equal points" %}
+                                            <b>{{ similar_players.info.result|title }} is ahead by {{ similar_players.info.difference }} points</b>
+                                        {% else %}
+                                            <b>Equal points</b>
+                                        {% endif %}
+                                      </span>
+                                    </button>
+                                  </h2>
+                                    <div id="similar_players" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="table-title">{{ user1|title }}</div>
+                                                <hr/>
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                      <tr>
+                                                        <th class="table-header" scope="col">Player</th>
+                                                        <th class="table-header" scope="col">Pts</th>
+                                                      </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for key, value in similar_players.team1.items %}
+                                                            <tr>
+                                                                <td class="table-content">{{ key|title }}</td>
+                                                                <td class="table-content">{{ value }}</td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-6">
+                                                <table class="table table-hover">
+                                                    <div class="table-title">{{ user2|title }}</div>
+                                                    <hr/>
+                                                    <thead>
+                                                      <tr>
+                                                        <th class="table-header" scope="col">Player</th>
+                                                        <th class="table-header" scope="col">Pts</th>
+                                                      </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for key, value in similar_players.team2.items %}
+                                                            <tr>
+                                                                <td class="table-content">{{ key|title }}</td>
+                                                                <td class="table-content">{{ value }}</td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>                                      
+                                    </div>
+                                </div>                      
+                            {% endif %}                  
+                            
+                            {% if different_players %}
+                                <div class="accordion-item">
+                                  <h2 class="accordion-header" id="flush-headingOne">
+                                    <button class="accordion-button acc-btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#different_players" aria-expanded="false" aria-controls="flush-collapseOne">
+                                      Different Players
+                                      <span class="status">
+                                        {% if different_players.info.result != "Equal points" %}
+                                            <b>{{ different_players.info.result|title }} is ahead by {{ different_players.info.difference }} points</b>
+                                        {% else %}
+                                            <b>Equal points</b>
+                                        {% endif %}
+                                      </span>
+                                    </button>
+                                  </h2>
+                                    <div id="different_players" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="table-title">{{ user1|title }}</div>
+                                                <hr/>
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                      <tr>
+                                                        <th class="table-header" scope="col">Player</th>
+                                                        <th class="table-header" scope="col">Pts</th>
+                                                      </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for key, value in different_players.team1.items %}
+                                                            <tr>
+                                                                <td class="table-content">{{ key|title }}</td>
+                                                                <td class="table-content">{{ value }}</td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="table-title">{{ user2|title }}</div>
+                                                <hr/>
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                      <tr>
+                                                        <th class="table-header" scope="col">Player</th>
+                                                        <th class="table-header" scope="col">Pts</th>
+                                                      </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for key, value in different_players.team2.items %}
+                                                            <tr>
+                                                                <td class="table-content">{{ key|title }}</td>
+                                                                <td class="table-content">{{ value }}</td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>                                      
+                                    </div>
+                                </div>                      
+                            {% endif %}  
+                            {% if cap_players %}
+                                <div class="accordion-item">
+                                  <h2 class="accordion-header" id="flush-headingOne">
+                                    <button class="accordion-button collapsed acc-btn" type="button" data-bs-toggle="collapse" data-bs-target="#cap_players" aria-expanded="false" aria-controls="flush-collapseOne">
+                                      Different Position Players
+                                      <span class="status">
+                                        {% if cap_players.info.result != "Equal points" %}
+                                            <b>{{ cap_players.info.result|title }} is ahead by {{ cap_players.info.difference }} points</b>
+                                        {% else %}
+                                            <b>Equal points</b>
+                                        {% endif %}
+                                      </span>
+                                    </button>
+                                  </h2>
+                                    <div id="cap_players" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="table-title">{{ user1|title }}</div>
+                                                <hr/>
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                      <tr>
+                                                        <th class="table-header" scope="col">Player</th>
+                                                        <th class="table-header" scope="col">Pts</th>
+                                                      </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for key, value in cap_players.team1.items %}
+                                                            {% if key == "captain" %}
+                                                                <tr>
+                                                                    <td class="table-content">{{ value.0|title }} (C)</td>
+                                                                    <td class="table-content">{{ value.1 }}</td>
+                                                                </tr>
+                                                            {% endif %}
+                                                            {% if key == "vice_captain" %}
+                                                                <tr>
+                                                                    <td class="table-content">{{ value.0|title }} (Vc)</td>
+                                                                    <td class="table-content">{{ value.1 }}</td>
+                                                                </tr>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="table-title">{{ user2|title }}</div>
+                                                <hr/>
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                      <tr>
+                                                        <th class="table-header" scope="col">Player</th>
+                                                        <th class="table-header" scope="col">Pts</th>
+                                                      </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for key, value in cap_players.team2.items %}
+                                                            {% if key == "captain" %}
+                                                                <tr>
+                                                                    <td class="table-content">{{ value.0|title }} (C)</td>
+                                                                    <td class="table-content">{{ value.1 }}</td>
+                                                                </tr>
+                                                            {% endif %}
+                                                            {% if key == "vice_captain" %}
+                                                                <tr>
+                                                                    <td class="table-content">{{ value.0|title}} (Vc)</td>
+                                                                    <td class="table-content">{{ value.1 }}</td>
+                                                                </tr>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>                                      
+                                    </div>
+                                </div>                      
+                            {% endif %}  
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script> -->
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+    <script>
+        
+        // var select_user_form = document.getElementById("select_users");
+        // select_user_form.addEventListener("submit", (e) => {
+        //     $.noConflict();
+        //     $.ajax({
+        //         url: "{% url 'compare-teams' %}",
+        //         type: 'POST',
+        //         data: {
+        //             team1: "1",
+        //             team2: "2",
+        //         },    
+        //         success: function (response) {
+        //             $("#comparision_table").html("{% include 'core/comparsion_table.html' %}")
+        //         }
+        //     })
+        // });
+    </script>
+{% endblock %}

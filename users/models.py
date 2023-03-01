@@ -23,7 +23,8 @@ class Profile(models.Model):
     rank = models.PositiveIntegerField(default=1, blank=True, null=True)
     orange_cap = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='orange_cap', default=None,null = True, blank = True)
     purple_cap = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='purple_cap', default=None,null = True, blank = True)
-     
+    reference = models.TextField(null=True, blank=True)
+
 
     def __str__(self):
         return self.user.username
@@ -32,8 +33,8 @@ class Profile(models.Model):
     #   "Match": {
     #       'Players': {
     #           'player_1' : [0,0,0],
-    #       }, 
+    #       },
     #       'total':[0,0,0]
     #   }
     # }
-    
+

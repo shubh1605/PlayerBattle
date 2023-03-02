@@ -7,7 +7,7 @@ from django.urls import reverse
 import requests as reqs
 # import pandas as pd
 # import numpy as np
-import requests	
+import requests
 import json
 
 
@@ -27,14 +27,14 @@ def start_match(request):
 			variable = Variable.objects.all()[0]
 			matches_completed = variable.number_of_match_completed
 			is_match_live = variable.is_any_match_live
-			
+
 			# print()
 			# if request.method == 'GET':
 
 			# 	print(is_match_live)
 			# 	all_matches = Match.objects.all()
 			# 	context = {
-			# 		"is_any_match_live": is_match_live, 
+			# 		"is_any_match_live": is_match_live,
 			# 	}
 			# 	return render(request, 'core/admin.html', context)
 			# else:
@@ -99,7 +99,7 @@ def end_match(request):
 
 			variable.is_any_match_live = False
 			variable.match_live = None
-			
+
 			live_match.points = json.dumps(points)
 			live_match.has_completed = True
 			live_match.is_live = False
@@ -114,7 +114,7 @@ def end_match(request):
 
 def allot_points_to_user(match_points, match, result):
 	user_profiles =  Profile.objects.filter(user__in= User.objects.filter(is_active=True))
-	for user_profile in user_profiles:		
+	for user_profile in user_profiles:
 		try:
 			user_matches = user_profile.matches.all()
 			user_players =  user_profile.players.all()
@@ -156,20 +156,20 @@ def allot_points_to_user(match_points, match, result):
 					user_match_info['match_prediction'] = 20.0
 			# print(user_match_info)
 			user_profile.prediction_score = user_prediction_score
-				
+
 			if match in user_matches:
 				match_bonus = 2
 				user_match_info['is_match_bonus'] = True
 			else:
-				user_match_info['is_match_bonus'] = False			
-			
+				user_match_info['is_match_bonus'] = False
+
 			for player in user_players:
 				if(player.name in match_points):
 					user_match_players[player.name] = [0.0,0.0,0.0]
 					if player.name not in user_points:
 						user_points[player.name] = [0.0,0.0,0.0]
 					if(player.name == user_captain):
-						user_total_points += (match_points[player.name][2] * 2 * match_bonus) 
+						user_total_points += (match_points[player.name][2] * 2 * match_bonus)
 						for i in range(3):
 							user_points[player.name][i] += (match_points[player.name][i] * 2 * match_bonus)
 							total[i] += (match_points[player.name][i] * 2 * match_bonus)
@@ -187,7 +187,7 @@ def allot_points_to_user(match_points, match, result):
 							user_points[player.name][i] += (match_points[player.name][i] * match_bonus)
 							total[i] += (match_points[player.name][i] * match_bonus)
 							user_match_players[player.name][i] = (match_points[player.name][i] * match_bonus)
-			
+
 			user_match_info['total'] = total
 			description[match.id]['Players'] = user_match_players
 			description[match.id]['Info'] = user_match_info
@@ -205,7 +205,7 @@ def allot_bonus_points(request):
 	users =  Profile.objects.filter(user__in= User.objects.filter(is_active=True))
 	orange_cap = request.POST['orange_cap']
 	purple_cap = request.POST['purple_cap']
-	
+
 	for user in users:
 		bonus = 0
 		bonus_points = {}
@@ -217,7 +217,7 @@ def allot_bonus_points(request):
 			bonus_points['purple_cap'] = 50
 		bonus_points['total'] = bonus
 		user.total_score += bonus
-		user.bonus_points = json.dumps(bonus_points)	
+		user.bonus_points = json.dumps(bonus_points)
 		user.save()
 	return HttpResponseRedirect(reverse('admin-func'))
 
@@ -237,7 +237,7 @@ def home_page(request):
 	best_bowler = players.order_by('-bowl_points').values()[0]
 	is_match_live = Variable.objects.all()[0]
 	new_predictions = {}
-	
+
 	if not request.user.is_anonymous:
 		logged_in_user = Profile.objects.get(user=request.user)
 		daily_prediction_match = Variable.objects.all()[0].daily_prediction.all()
@@ -248,11 +248,11 @@ def home_page(request):
 			new_predictions[match] = {}
 			# match = Match.objects.get(id=match_id)
 			if str(match_id) not in user_predictions.keys():
-				
+
 				new_predictions[match]['prediction'] = None
 				new_predictions[match]['result'] = match.name.split(" vs ")
 				new_predictions[match]['result'].append("tie")
-			else:				
+			else:
 				new_predictions[match]['prediction'] = user_predictions[str(match_id)]
 
 	context = {
@@ -316,19 +316,19 @@ def calculate_players_stats_view(request):
 		player_name = request.GET.get('query_name')
 		player_data = Player.objects.get(name = player_name)
 		# print()
-	
+
 	all_player_matches = player_data.matches.all()
-	
+
 	player_stat = {}
 
 	for match in all_player_matches:
-		
+
 		points = json.loads(match.points)
-		
+
 		if player_name in points:
 			player_stat[match.name] = points[player_name][2]
-		
-	
+
+
 	return JsonResponse(json.dumps(player_stat),safe=False)
 
 def admin_func(request):
@@ -344,9 +344,9 @@ def admin_func(request):
 				teams = matches_live.name.split(" vs ")
 				team1, team2 = teams[0], teams[1]
 				results = [team1,team2,"tie", "no result"]
-				
+
 			context = {
-				"remaining_matches": remaining_matches, 
+				"remaining_matches": remaining_matches,
 				"match_live": matches_live,
 				"players":players,
 				"results":results,
@@ -360,7 +360,7 @@ def admin_func(request):
 		message = f'Oops! An error occured.'
 		messages.error(request, message )
 		return redirect('home-page')
-	
+
 
 def logout_view(request):
 	logout(request)
@@ -371,10 +371,10 @@ def logout_view(request):
 def login_user(request):
 	if request.method == "POST":
 		username = request.POST['username']
-		password = request.POST['password']		
+		password = request.POST['password']
 
 		user = authenticate(username=username,password=password)
-	
+
 		if user is not None:
 			if user.is_active:
 				login(request, user)
@@ -389,12 +389,12 @@ def login_user(request):
 			message = "Invalid credentials or wait for your account to be activated by the admin!	"
 			messages.error(request, message )
 			return redirect('login')
-			
+
 	else:
 		return render(request, 'core/login.html')
 
 def register(request):
-	
+
 	if request.method == "POST":
 		first_name = request.POST['first_name']
 		last_name = request.POST['last_name']
@@ -409,7 +409,7 @@ def register(request):
 
 		if password1 == password2:
 			if reference in all_usernames:
-				try: 
+				try:
 					new_user = User.objects.create_user(first_name=first_name,last_name=last_name,email=email,username=username,password=password1,is_active=False)
 					new_user.save()
 					messages.success(request, "Profile created!" )
@@ -420,18 +420,18 @@ def register(request):
 					# print("same username")
 					return redirect ("register")
 			else:
-				messages.error(request, "Please enter a valid username" )	
+				messages.error(request, "Please enter a valid reference" )
 				return redirect ("register")
 
-				
+
 		else:
-			messages.error(request, "Please confirm your passwords" )	
+			messages.error(request, "Please confirm your passwords" )
 			return redirect ("register")
 		# print(name+" "+email+" "+username+" "+password1+" "+password2)
 
 	else:
 		return render(request, "core/register.html")
-		
+
 def profile(request, id):
 	logged_in_user = request.user
 	profile_viewing_user = User.objects.get(id=id)
@@ -456,7 +456,7 @@ def profile(request, id):
 
 	points_description = json.loads(prof_viewing.points_description)
 	points_description = dict(reversed(list(points_description.items())))
-	
+
 	# print(sorted_points)
 	context = {
 		'profile_viewing_player_points': sorted_points,
@@ -483,7 +483,7 @@ def compare_teams(request):
 				"all_users": all_users,
 			}
 			return render(request, 'core/compare_teams.html', context)
-		
+
 		if request.method == "POST":
 			all_users = Profile.objects.filter(user__in= User.objects.filter(is_active=True))
 			user1_id = request.POST['team1']
@@ -504,7 +504,7 @@ def compare_teams(request):
 			prof2_vice_captain = prof2.vice_captain
 			prof2_matches = prof2.matches.all()
 			prof2_points = json.loads(prof2.points)
-			
+
 			similar_players = {}
 			similar_players["team1"] = {}
 			similar_players["team2"] = {}
@@ -541,8 +541,8 @@ def compare_teams(request):
 			for player in prof1_players:
 				if player != prof1_captain and player != prof1_vice_captain and player != prof2_captain and player != prof2_vice_captain:
 					if(player in prof2_players):
-						same_t1[player.name] = prof1_points[player.name][2]						
-						same_t2[player.name] = prof2_points[player.name][2]						
+						same_t1[player.name] = prof1_points[player.name][2]
+						same_t2[player.name] = prof2_points[player.name][2]
 						same_total1 += int(prof1_points[player.name][2])
 						same_total2 += int(prof2_points[player.name][2])
 					else:
@@ -551,8 +551,8 @@ def compare_teams(request):
 
 			if prof1.captain == prof2.captain:
 				player = prof1.captain
-				same_t1[player.name+" (c) "] = prof1_points[player.name][2]						
-				same_t2[player.name+" (c) "] = prof2_points[player.name][2]						
+				same_t1[player.name+" (c) "] = prof1_points[player.name][2]
+				same_t2[player.name+" (c) "] = prof2_points[player.name][2]
 				same_total1 += int(prof1_points[player.name][2])
 				same_total2 += int(prof2_points[player.name][2])
 			else:
@@ -565,7 +565,7 @@ def compare_teams(request):
 					player = prof1_captain
 					diff_t2[player.name] = prof2_points[player.name][2]
 					diff_total2 += int(prof2_points[player.name][2])
-				
+
 				if prof2_captain != prof1_vice_captain and prof2_captain in prof1_players:
 					player = prof2_captain
 					diff_t1[player.name] = prof1_points[player.name][2]
@@ -573,8 +573,8 @@ def compare_teams(request):
 
 			if prof1.vice_captain == prof2.vice_captain:
 				player = prof1.vice_captain
-				same_t1[player.name+" (vc) "] = prof1_points[player.name][2]						
-				same_t2[player.name+" (vc) "] = prof2_points[player.name][2]						
+				same_t1[player.name+" (vc) "] = prof1_points[player.name][2]
+				same_t2[player.name+" (vc) "] = prof2_points[player.name][2]
 				same_total1 += int(prof1_points[player.name][2])
 				same_total2 += int(prof2_points[player.name][2])
 			else:
@@ -587,7 +587,7 @@ def compare_teams(request):
 					player = prof1_vice_captain
 					diff_t2[player.name] = prof2_points[player.name][2]
 					diff_total2 += int(prof2_points[player.name][2])
-				
+
 				if prof2_vice_captain != prof1_captain and prof2_vice_captain in prof1_players:
 					player = prof2_vice_captain
 					diff_t1[player.name] = prof1_points[player.name][2]
@@ -605,11 +605,11 @@ def compare_teams(request):
 			else:
 				same_info['result'] = "Equal points"
 				same_info['difference'] = 0.0
-			
+
 			similar_players["team1"] = same_t1
 			similar_players["team2"] = same_t2
 			similar_players["info"] = same_info
-			
+
 			for player in prof2_players:
 				if player != prof1_captain and player != prof1_vice_captain and player != prof2_captain and player != prof2_vice_captain:
 					if(player not in prof1_players):
@@ -627,7 +627,7 @@ def compare_teams(request):
 			else:
 				diff_info['result'] = "Equal points"
 				diff_info['difference'] = 0.0
-			
+
 			different_players["team1"] = diff_t1
 			different_players["team2"] = diff_t2
 			different_players["info"] = diff_info
@@ -656,7 +656,7 @@ def compare_teams(request):
 				'user1': user1.username,
 				'user2': user2.username,
 			}
-			   
+
 			return render(request, 'core/compare_teams.html', context)
 
 def search_user(request):
@@ -672,7 +672,7 @@ def search_user(request):
 		print("error")
 		return redirect('home-page')
 
-		
+
 
 def edit_captain(request):
 	if not request.user.is_anonymous:
@@ -689,7 +689,7 @@ def edit_captain(request):
 			messages.success(request, message )
 			prof.save()
 			new_change.save()
-			
+
 			return redirect('profile', id=request.user.id)
 		else:
 			message = f'No more changes can be made!'
@@ -702,7 +702,7 @@ def edit_captain(request):
 
 def edit_vice_captain(request):
 	if not request.user.is_anonymous:
-		new_vice_cap_id = request.POST['vice_captain']	
+		new_vice_cap_id = request.POST['vice_captain']
 		new_vice_cap = Player.objects.get(id=new_vice_cap_id)
 		prof = Profile.objects.get(user=request.user)
 		if prof.vice_captain_changes != 0:
@@ -761,9 +761,9 @@ def create_team(request):
 				'selected_purple_cap': selected_purple_cap,
 			}
 			return render(request, 'core/create_team.html', context)
-		if request.method == "POST":	
+		if request.method == "POST":
 			try:
-				user_points = {}	
+				user_points = {}
 				players = request.POST.getlist('players')
 				captain = request.POST['captain']
 				vice_captain = request.POST['vice_captain']
@@ -781,19 +781,19 @@ def create_team(request):
 					player = Player.objects.get(id=pid)
 					prof.players.add(player)
 					user_points[player.name] = [0.0,0.0,0.0]
-				
+
 				prof.matches.clear()
 				for mid in matches:
 					match = Match.objects.get(id=mid)
 					prof.matches.add(match)
-				
-				prof.points = json.dumps(user_points)	
+
+				prof.points = json.dumps(user_points)
 				prof.save()
 				message = f'Your team has been successfully created!'
 				messages.success(request, message)
 			except:
 				message = f'An error occured! Please try again.'
-				messages.error(request, message )		
+				messages.error(request, message )
 			context = {
 				'user':curr_user,
 				'all_matches':matches,
@@ -827,9 +827,9 @@ def get_match_players(match_link):
 		y = x[2].find('a').attrs['href'].split('/')
 		z = y[2].split('-')[:-1]
 		players_dict[" ".join(z)] = [0.0,0.0,0.0]
-	
+
 	return players_dict
-	
+
 def get_match_points(match_link, points):
 	# series_link = "indian-premier-league-2023-1345038"
 	# series_link = "icc-men-s-t20-world-cup-2022-23-1298134"
@@ -853,9 +853,9 @@ def get_match_points(match_link, points):
 				runs = int(td[2].find('strong').text)
 				if(name not in points):
 					points[name] = [0.0,0.0,0.0]
-				points[name][0] += runs  
-				points[name][2] += runs  
-				
+				points[name][0] += runs
+				points[name][2] += runs
+
 
 			elif len(td) > 8:
 				name_temp = td[0].find('a').attrs['href'].split('/')
@@ -864,13 +864,13 @@ def get_match_points(match_link, points):
 				wicks = int(td[4].find('strong').text)
 				if(name not in points):
 					points[name] = [0.0,0.0,0.0]
-				points[name][1] += (wicks*25)  
-				points[name][2] += (wicks*25)  
+				points[name][1] += (wicks*25)
+				points[name][2] += (wicks*25)
 
-	return points  
+	return points
 
 
-	
+
 
 
 
@@ -905,7 +905,7 @@ def add_all_players_match_wise(request):
 	matches_soup = BeautifulSoup(matches_src,'lxml')
 	matches_data = matches_soup.find('div', class_ = "ds-w-full ds-bg-fill-content-prime ds-overflow-hidden ds-rounded-xl ds-border ds-border-line").find('div', class_ = "ds-p-0").findAll('div', class_ = "ds-p-4")
 	matches_link = []
-	
+
 
 
 	for match in matches_data:
@@ -944,7 +944,7 @@ def add_all_players_match_wise(request):
 			points[" ".join(z)] = 0
 
 
-			
+
 
 
 	# print(points)
@@ -984,7 +984,7 @@ def add_all_players_match_wise(request):
 			plyr = Player.objects.get(name=pl)
 			# print(plyr)
 			curr_match.players.add(plyr)
-			
+
 		curr_match.save()
 
 	return HttpResponse("OK")

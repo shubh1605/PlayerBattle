@@ -150,7 +150,7 @@
     
       <li class="nav-item">
         <a class="nav-link {% if request.path != player_url %}collapsed{% endif %}" href="{% url 'player-stats' %}">
-          <i class="bi bi-person"></i>
+          <i class="bi bi-clipboard-data"></i>
           <span>Player Stats</span>
         </a>
       </li><!-- End Profile Page Nav -->
@@ -165,7 +165,7 @@
 
         <li class="nav-item">
           <a class="nav-link {% if request.path != compare_teams %}collapsed{% endif %}" href="{% url 'compare-teams' %}">
-            <i class="bi bi-person"></i>
+            <i class="bi bi-layout-split"></i>
               <span>Compare Teams</span>
           </a>
         </li><!-- End Profile Page Nav -->
@@ -173,7 +173,7 @@
         {% if enable_create_team %}
           <li class="nav-item">
             <a class="nav-link {% if request.path != create_team_url %}collapsed{% endif %}" href="{% url 'create-team' %}">
-              <i class="bi bi-person"></i>
+              <i class="bi bi-gear"></i>
               <span>Create Team </span>
             </a>
           </li><!-- End Profile Page Nav -->
@@ -182,7 +182,7 @@
         {% if request.user.is_superuser %}
           <li class="nav-item">
             <a class="nav-link {% if request.path != admin_url %}collapsed{% endif %}" href="{% url 'admin-func' %}">
-              <i class="bi bi-person"></i>
+              <i class="bi bi-gear"></i>
               <span>Admin Roles</span>
             </a>
           </li>

@@ -394,26 +394,35 @@ def login_user(request):
 		return render(request, 'core/login.html')
 
 def register(request):
+	
 	if request.method == "POST":
 		first_name = request.POST['first_name']
 		last_name = request.POST['last_name']
 		email = request.POST['email']
+		reference = request.POST['reference']
 		username = request.POST['username']
 		password1 = request.POST['password1']
 		password2 = request.POST['password2']
 		existing_user = User.objects.filter(email=email)
+		all_users = User.objects.values()
+		all_usernames = [user['username'] for user in all_users]
 
 		if password1 == password2:
-			try: 
-				new_user = User.objects.create_user(first_name=first_name,last_name=last_name,email=email,username=username,password=password1,is_active=False)
-				new_user.save()
-				messages.success(request, "Profile created!" )
-				return redirect("login")
-			except:
-				# print("here2")
-				messages.error(request, "Username already taken!" )
-				# print("same username")
+			if reference in all_usernames:
+				try: 
+					new_user = User.objects.create_user(first_name=first_name,last_name=last_name,email=email,username=username,password=password1,is_active=False)
+					new_user.save()
+					messages.success(request, "Profile created!" )
+					return redirect("login")
+				except:
+					# print("here2")
+					messages.error(request, "Username already taken!" )
+					# print("same username")
+					return redirect ("register")
+			else:
+				messages.error(request, "Please enter a valid username" )	
 				return redirect ("register")
+
 				
 		else:
 			messages.error(request, "Please confirm your passwords" )	

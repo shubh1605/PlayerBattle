@@ -408,7 +408,7 @@ def register(request):
 		all_usernames = [user['username'] for user in all_users]
 
 		if password1 == password2:
-			if reference in all_usernames:
+			if (reference in all_usernames) or reference=="" :
 				try:
 					new_user = User.objects.create_user(first_name=first_name,last_name=last_name,email=email,username=username,password=password1,is_active=False)
 					new_user.save()

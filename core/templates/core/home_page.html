@@ -2,6 +2,7 @@
 {% extends 'core/base.html' %}
 {% load static %}
 {% block style %}
+{% load mathfilters %}
   <link href="{% static 'core/assets/css/homepage.css' %}" rel="stylesheet">
 {% endblock %}
 
@@ -267,11 +268,10 @@
                 <h5 class="card-title">MVP<span> | Most Points </span></h5>
                 <div class="d-flex align-items-center">
                   <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                    <i class="bi bi-cart"></i>
+                    <img class="img-icon" src={% static 'core/assets/img/bat-ball.png' %}></img>
                   </div>
                   <div class="ps-3">
                     <h5> {{ players.0.name|title }} - {{ players.0.total_points }} </h5>
-                    {% comment %} <span class="text-muted small pt-2 ps-1"></span> {% endcomment %}
                   </div>
                 </div>
               </div>
@@ -282,7 +282,7 @@
                 <h5 class="card-title">Batting <span>| Most Runs </span></h5>
                 <div class="d-flex align-items-center">
                   <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                    <i class="bi bi-currency-dollar"></i>
+                   <img class="img-icon" src={% static 'core/assets/img/bat.png' %}></img>
                   </div>
                   <div class="ps-3">
                     <h5>{{ best_batsman.name|title }} - {{ best_batsman.bat_points }}  </h5>
@@ -296,10 +296,11 @@
                 <h5 class="card-title">Bowling <span>| Most Wickets</span></h5>
                 <div class="d-flex align-items-center">
                   <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                    <i class="bi bi-people"></i>
+                    {% comment %} <i class="bi bi-people"></i> {% endcomment %}
+                    <img class="img-icon" src={% static 'core/assets/img/ball.png' %}></img>
                   </div>
                   <div class="ps-3">
-                    <h5> {{ best_bowler.name|title }} - {{ best_bowler.bowl_points }}</h5>
+                    <h5> {{ best_bowler.name|title }} - {{ best_bowler.bowl_points|div:25  }}</h5>
                   </div>
                 </div>
               </div>

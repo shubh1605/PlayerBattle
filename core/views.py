@@ -398,36 +398,37 @@ def register(request):
 	if request.method == "POST":
 		first_name = request.POST['first_name']
 		last_name = request.POST['last_name']
-		email = request.POST['email']
+		# email = request.POST['email']
 		reference = request.POST['reference']
 		username = request.POST['username']
 		password1 = request.POST['password1']
 		password2 = request.POST['password2']
-		existing_user = User.objects.filter(email=email)
+		number = request.POST['number']
+		# existing_user = User.objects.filter(email=email)
 		all_users = User.objects.values()
 		all_usernames = [user['username'] for user in all_users]
 
 		if password1 == password2:
 			if (reference in all_usernames) or reference=="" :
 				try:
-					new_user = User.objects.create_user(first_name=first_name,last_name=last_name,email=email,username=username,password=password1,is_active=False)
+					new_user = User.objects.create_user(first_name=first_name,last_name=last_name,username=username,password=password1,is_active=False)
 					new_user.save()
-					messages.success(request, "Profile created!" )
+					prof = Profile.objects.get(user=new_user)
+					prof.contact_no = number
+					prof.save()
+					messages.success(request, "Profile created, kindly pay on UPI ID - 9819340022@paytm" )
+					messages.success(request, "Admin will activate your account within 24 hours of payment.")
 					return redirect("login")
 				except:
-					# print("here2")
 					messages.error(request, "Username already taken!" )
-					# print("same username")
 					return redirect ("register")
 			else:
 				messages.error(request, "Please enter a valid reference" )
 				return redirect ("register")
 
-
 		else:
 			messages.error(request, "Please confirm your passwords" )
 			return redirect ("register")
-		# print(name+" "+email+" "+username+" "+password1+" "+password2)
 
 	else:
 		return render(request, "core/register.html")

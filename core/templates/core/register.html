@@ -109,7 +109,7 @@
 
                         <div class="col-6">
                           <label for="yourName" class="form-label"
-                            >Your First Name</label
+                            >Your First Name <span class="required">*</span></label
                           >
                           <input
                             type="text"
@@ -125,7 +125,7 @@
   
                         <div class="col-6">
                           <label for="yourName" class="form-label"
-                            >Your Last Name</label
+                            >Your Last Name <span class="required">*</span></label
                           >
                           <input
                             type="text"
@@ -143,24 +143,24 @@
                       
 
                       <div class="col-12">
-                        <label for="yourEmail" class="form-label"
-                          >Your Email</label
+                        <label for="ContactNumber" class="form-label"
+                          >Your WhatsApp Number <span class="required">*</span></label
                         >
                         <input
-                          type="email"
-                          name="email"
+                          type="number"
+                          name="number"
                           class="form-control"
-                          id="yourEmail"
+                          id="yourNumber"
                           required
                         />
                         <div class="invalid-feedback">
-                          Please enter a valid Email adddress!
+                          Please enter a valid number!
                         </div>
                       </div>
 
                       <div class="col-12">
                         <label for="reference" class="form-label"
-                          >Your reference</label
+                          >Your referral code (if any)</label
                         >
                         <input
                           type="text"
@@ -176,7 +176,7 @@
 
                       <div class="col-12">
                         <label for="yourUsername" class="form-label"
-                          >Username</label
+                          >Username <span class="required">*</span></label
                         >
                         <div class="input-group has-validation">
                           
@@ -195,7 +195,7 @@
 
                       <div class="col-12">
                         <label for="yourPassword" class="form-label"
-                          >Password</label
+                          >Password <span class="required">* (Cannot be changed) </span></label
                         >
                         <input
                           type="password"
@@ -210,7 +210,7 @@
                       </div>
                       <div class="col-12">
                         <label for="yourPassword" class="form-label"
-                          >Confirm Password</label
+                          >Confirm Password <span class="required">*</span></label
                         >
                         <input
                           type="password"

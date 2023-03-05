@@ -1309,3 +1309,14 @@ h6 {
   text-align: left;
   font-weight: 600;
 }
+
+.required {
+  color: #ed3c0d;
+  text-align: left;
+  font-weight: 600;
+}
+
+.img-icon {
+  height: 40px;
+  width: 40px;
+}

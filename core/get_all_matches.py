@@ -1,10 +1,9 @@
 from bs4 import BeautifulSoup
 import requests	
-from models import Match
 
-# series_link = "indian-premier-league-2023-1345038"
+series_link = "indian-premier-league-2023-1345038"
 # series_link = "icc-men-s-t20-world-cup-2022-23-1298134"
-series_link = "pakistan-super-league-2022-23-1332128"
+# series_link = "pakistan-super-league-2022-23-1332128"
 
 matches_src =  requests.get("https://www.espncricinfo.com/series/"+series_link+"/match-schedule-fixtures-and-results").text
 matches_soup = BeautifulSoup(matches_src,'lxml')
@@ -27,7 +26,7 @@ for match in matches_data:
     
     matches_link.append(temp_list[3])
 
-# print(matches_link)
+print(matches_link)
 
 # all_players = []
 # for match in matches_link[0:1]:

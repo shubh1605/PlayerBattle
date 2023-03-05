@@ -2,9 +2,13 @@ from bs4 import BeautifulSoup
 import requests	
 # series_link = "indian-premier-league-2023-1345038"
 # series_link = "icc-men-s-t20-world-cup-2022-23-1298134"
-series_link = "pakistan-super-league-2022-23-1332128"
+# series_link = "pakistan-super-league-2022-23-1332128"
+series_link = "women-s-premier-league-2022-23-1348825"
 
-match_link = "quetta-gladiators-vs-islamabad-united-13th-match-1354936"
+
+# https://www.espncricinfo.com/series/women-s-premier-league-2022-23-1348825/royal-challengers-bangalore-women-vs-delhi-capitals-women-2nd-match-1358930/live-cricket-score
+# match_link = "quetta-gladiators-vs-islamabad-united-13th-match-1354936"
+match_link = "royal-challengers-bangalore-women-vs-delhi-capitals-women-2nd-match-1358930"
 
 live_match_src =  requests.get("https://www.espncricinfo.com/series/"+series_link+"/"+match_link+"/live-cricket-score").text
 live_score = BeautifulSoup(live_match_src,'lxml')

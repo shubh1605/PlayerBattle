@@ -12,6 +12,7 @@ def users(request):
 	return {
 		'context_users': usernames,
 		'enable_create_team': variable.enable_create_team,
+		'enable_view_other_profiles': variable.enable_view_other_profile,
 	}
 
 # def is_create_team_enabled(request):

@@ -2,13 +2,13 @@ from bs4 import BeautifulSoup
 import requests	
 # series_link = "indian-premier-league-2023-1345038"
 # series_link = "icc-men-s-t20-world-cup-2022-23-1298134"
-# series_link = "pakistan-super-league-2022-23-1332128"
-series_link = "women-s-premier-league-2022-23-1348825"
+series_link = "pakistan-super-league-2022-23-1332128"
+# series_link = "women-s-premier-league-2022-23-1348825"
 
 
 # https://www.espncricinfo.com/series/women-s-premier-league-2022-23-1348825/royal-challengers-bangalore-women-vs-delhi-capitals-women-2nd-match-1358930/live-cricket-score
-# match_link = "quetta-gladiators-vs-islamabad-united-13th-match-1354936"
-match_link = "royal-challengers-bangalore-women-vs-delhi-capitals-women-2nd-match-1358930"
+match_link = "islamabad-united-vs-quetta-gladiators-21st-match-1354944"
+# match_link = "royal-challengers-bangalore-women-vs-delhi-capitals-women-2nd-match-1358930"
 
 live_match_src =  requests.get("https://www.espncricinfo.com/series/"+series_link+"/"+match_link+"/live-cricket-score").text
 live_score = BeautifulSoup(live_match_src,'lxml')
@@ -16,7 +16,7 @@ live_score = BeautifulSoup(live_match_src,'lxml')
 matches_data = live_score.find('table', class_ = "ds-w-full").findAll('tbody', class_ = "ds-text-right")
 batting = []
 bowling = []
-if matches_data[0] != None:
+if len(matches_data) > 0:
     bat_scores = matches_data[0].findAll('tr')
     for i in range(len(bat_scores)):
         batsman_details = []
@@ -29,7 +29,7 @@ if matches_data[0] != None:
             batsman_details.append(batter[4].text)
         batting.append(batsman_details)
 
-if matches_data[1] != None:
+if len(matches_data) > 1:
     bowl_scores = matches_data[1].findAll('tr')
     for i in range(len(bowl_scores)):
         bowler_details = []

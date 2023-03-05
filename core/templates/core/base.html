@@ -18,7 +18,7 @@
   <meta content="" name="keywords">
 
   <!-- Favicons -->
-  <link href="{% static 'core/assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'core/assets/img/cricket.png' %}" rel="icon">
   <link href="{% static 'core/assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
@@ -62,7 +62,7 @@
 
     <div class="d-flex align-items-center justify-content-between">
       <a href="{% url 'home-page' %}" class="logo d-flex align-items-center">
-        <img src="{% static 'core/assets/img/logo.png' %}" alt="">
+        <img src="{% static 'core/assets/img/cricket.png' %}" alt="">
         <span class="d-none d-lg-block">PlayerBattle</span>
       </a>
       <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -161,13 +161,15 @@
               <span>Profile</span>
           </a>
         </li><!-- End Profile Page Nav -->
-
-        <li class="nav-item">
-          <a class="nav-link {% if request.path != compare_teams %}collapsed{% endif %}" href="{% url 'compare-teams' %}">
-            <i class="bi bi-layout-split"></i>
-              <span>Compare Teams</span>
-          </a>
-        </li><!-- End Profile Page Nav -->
+        
+        {% if enable_view_other_profiles %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.path != compare_teams %}collapsed{% endif %}" href="{% url 'compare-teams' %}">
+              <i class="bi bi-layout-split"></i>
+                <span>Compare Teams</span>
+            </a>
+          </li><!-- End Profile Page Nav -->
+        {% endif %}
 
         {% if enable_create_team %}
           <li class="nav-item">

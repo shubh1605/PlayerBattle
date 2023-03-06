@@ -86,7 +86,7 @@ def end_match(request):
 					p.save()
 					live_match.players.add(p)
 			# print(points)
-			user_profiles =  Profile.objects.filter(user__in= User.objects.filter(is_active=True)).order_by('-total_score')
+			user_profiles =  Profile.objects.filter(user__in= User.objects.filter(is_active=True, is_superuser = False)).order_by('-total_score')
 			no_error = allot_points_to_user(points, live_match, result)
 			if no_error:
 				return HttpResponseRedirect(reverse('admin-func'))
@@ -113,7 +113,7 @@ def end_match(request):
 			return HttpResponse("Login")
 
 def allot_points_to_user(match_points, match, result):
-	user_profiles =  Profile.objects.filter(user__in= User.objects.filter(is_active=True))
+	user_profiles =  Profile.objects.filter(user__in= User.objects.filter(is_active=True, is_superuser = False))
 	for user_profile in user_profiles:
 		try:
 			user_matches = user_profile.matches.all()
@@ -202,7 +202,7 @@ def allot_points_to_user(match_points, match, result):
 	return False
 
 def allot_bonus_points(request):
-	users =  Profile.objects.filter(user__in= User.objects.filter(is_active=True))
+	users =  Profile.objects.filter(user__in= User.objects.filter(is_active=True, is_superuser = False))
 	orange_cap = request.POST['orange_cap']
 	purple_cap = request.POST['purple_cap']
 
@@ -231,7 +231,7 @@ def start_daily_match_prediction(request):
 	return HttpResponseRedirect(reverse('admin-func'))
 
 def home_page(request):
-	users = Profile.objects.filter(user__in= User.objects.filter(is_active=True))
+	users = Profile.objects.filter(user__in= User.objects.filter(is_active=True, is_superuser = False))
 	players = Player.objects.all().order_by('-total_points').values()
 	best_batsman = players.order_by('-bat_points').values()[0]
 	best_bowler = players.order_by('-bowl_points').values()[0]
@@ -479,14 +479,14 @@ def compare_teams(request):
 		return redirect('home-page')
 	else:
 		if request.method == "GET":
-			all_users = Profile.objects.filter(user__in= User.objects.filter(is_active=True))
+			all_users = Profile.objects.filter(user__in= User.objects.filter(is_active=True, is_superuser = False))
 			context = {
 				"all_users": all_users,
 			}
 			return render(request, 'core/compare_teams.html', context)
 
 		if request.method == "POST":
-			all_users = Profile.objects.filter(user__in= User.objects.filter(is_active=True))
+			all_users = Profile.objects.filter(user__in= User.objects.filter(is_active=True, is_superuser = False))
 			user1_id = request.POST['team1']
 			user2_id = request.POST['team2']
 			user1 = User.objects.get(id=user1_id)

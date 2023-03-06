@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from core.models import Variable
 def users(request):
 	# print(context_users)
-	profiles = Profile.objects.filter(user__in= User.objects.filter(is_active=True))
+	profiles = Profile.objects.filter(user__in= User.objects.filter(is_active=True, is_superuser = False))
 	usernames = ""
 	variable = Variable.objects.all()[0]
 	for profile in profiles:

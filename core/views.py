@@ -423,6 +423,7 @@ def register(request):
 					new_user.save()
 					prof = Profile.objects.get(user=new_user)
 					prof.contact_no = number
+					prof.reference = reference
 					prof.save()
 					messages.success(request, "Profile created, kindly pay on UPI ID - 9819340022@paytm" )
 					messages.success(request, "Admin will activate your account within 24 hours of payment.")
@@ -945,7 +946,7 @@ def get_live_score(request, id):
 		'batting':batting,
 		'bowling':bowling,
 	}
-	
+
 	return render(request, 'core/live_score.html', context)
 
 

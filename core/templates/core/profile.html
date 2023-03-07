@@ -262,6 +262,12 @@
                   </div> 
                 </div>
                 <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
+                  {% if is_match_live %}
+                    <div class="message">
+                      <p><small> A match is live, cannot edit right now. </small></p>
+                    </div>
+                    <hr />
+                  {% endif %}
                   <!-- Captain Edit Form -->
                   <form action="{% url 'edit-captain' %}" method="post">
                     {% csrf_token %}  
@@ -282,7 +288,7 @@
                       </div>
                       <div class="col-md-3 col-lg-3 edit-profile">
                         <div class="text-center">
-                          {% if profile_viewing.captain_changes != 0 %}
+                          {% if profile_viewing.captain_changes != 0 and not is_match_live %}
                             <button type="submit" class="btn btn-primary">Save Changes</button>
                           {% else %}
                             <button type="submit" class="btn btn-primary" disabled>Save Changes</button>
@@ -293,7 +299,7 @@
                   </form><!-- End Captain Edit Form -->
                   <div class="message">
                     {% if profile_viewing.captain_changes != 0 %}
-                      <p> <small> *Can change the captain only {{ profile_viewing.captain_changes }} time(s)</small> </p>
+                      <p> <small> *Can change the captain only {{ profile_viewing.captain_changes }} time</small> </p>
                     {% else %}
                       <p> <small> *Cannot make any changes </small> </p>
                     {% endif %}
@@ -320,7 +326,7 @@
                       </div>
                       <div class="col-md-3 col-lg-3 edit-profile">
                         <div class="text-center">
-                          {% if profile_viewing.vice_captain_changes != 0 %}
+                          {% if profile_viewing.vice_captain_changes != 0 and not is_match_live %}
                             <button type="submit" class="btn btn-primary">Save Changes</button>
                           {% else %}
                             <button type="submit" class="btn btn-primary" disabled>Save Changes</button>
@@ -331,7 +337,7 @@
                   </form><!-- End Vice Captain Edit Form -->
                   <div class="message">
                     {% if profile_viewing.vice_captain_changes != 0 %}
-                      <p> <small> *Can change the vice captain only {{ profile_viewing.vice_captain_changes }} time(s)</small> </p>
+                      <p> <small> *Can change the vice captain only {{ profile_viewing.vice_captain_changes }} time</small> </p>
                     {% else %}
                       <p> <small> *Cannot make any changes </small> </p>
                     {% endif %}

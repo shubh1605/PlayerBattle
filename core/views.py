@@ -211,10 +211,10 @@ def allot_bonus_points(request):
 		bonus_points = {}
 		if str(user.orange_cap.id) == orange_cap:
 			bonus += 50
-			bonus_points['orange_cap'] = 50
+			bonus_points['orange_cap'] = 100
 		if str(user.purple_cap.id) ==purple_cap:
 			bonus += 50
-			bonus_points['purple_cap'] = 50
+			bonus_points['purple_cap'] = 100
 		bonus_points['total'] = bonus
 		user.total_score += bonus
 		user.bonus_points = json.dumps(bonus_points)
@@ -235,7 +235,14 @@ def home_page(request):
 	players = Player.objects.all().order_by('-total_points').values()
 	best_batsman = players.order_by('-bat_points').values()[0]
 	best_bowler = players.order_by('-bowl_points').values()[0]
-	is_match_live = Variable.objects.all()[0]
+	variable =  Variable.objects.all()[0]
+	is_match_live = variable.is_any_match_live
+	live_match_id = None
+	live_match_name = None
+	if is_match_live:
+		live_match_id = variable.match_live.id
+		live_match_name = variable.match_live.name
+
 	new_predictions = {}
 
 	if not request.user.is_anonymous:
@@ -248,20 +255,21 @@ def home_page(request):
 			new_predictions[match] = {}
 			# match = Match.objects.get(id=match_id)
 			if str(match_id) not in user_predictions.keys():
-
 				new_predictions[match]['prediction'] = None
 				new_predictions[match]['result'] = match.name.split(" vs ")
 				new_predictions[match]['result'].append("tie")
 			else:
 				new_predictions[match]['prediction'] = user_predictions[str(match_id)]
-
+	
 	context = {
 		'users':users,
 		'players':players,
 		'best_batsman':best_batsman,
 		'best_bowler':best_bowler,
-		'is_match_live':is_match_live.match_live,
-		'new_predictions':new_predictions
+		'is_match_live':is_match_live,
+		'new_predictions':new_predictions,
+		'live_match_id':live_match_id,
+		'live_match_name':live_match_name,
 	}
 	return render(request, 'core/home_page.html', context)
 
@@ -458,6 +466,8 @@ def profile(request, id):
 	points_description = json.loads(prof_viewing.points_description)
 	points_description = dict(reversed(list(points_description.items())))
 
+	is_match_live = Variable.objects.all()[0].is_any_match_live
+
 	# print(sorted_points)
 	context = {
 		'profile_viewing_player_points': sorted_points,
@@ -468,6 +478,7 @@ def profile(request, id):
 		'viewing_another_profile': viewing_another_prof,
 		'profile_viewing_matches': profile_viewing_matches,
 		'points_description':points_description,
+		'is_match_live':is_match_live,
 	}
 	return render(request, 'core/profile.html', context)
 
@@ -870,7 +881,72 @@ def get_match_points(match_link, points):
 
 	return points
 
+def get_live_score(request, id):
+	series_link = "pakistan-super-league-2022-23-1332128"
+	live_match = Match.objects.get(id=id)
 
+	match_link = live_match.link
+
+	live_match_src =  requests.get("https://www.espncricinfo.com/series/"+series_link+"/"+match_link+"/live-cricket-score").text
+	live_score = BeautifulSoup(live_match_src,'lxml')
+
+	matches_data = live_score.find('table', class_ = "ds-w-full").findAll('tbody', class_ = "ds-text-right")
+	batting = []
+	bowling = []
+	if len(matches_data) > 0:
+		bat_scores = matches_data[0].findAll('tr')
+		for i in range(len(bat_scores)):
+			batsman_details = []
+			if bat_scores[i] != None:
+				batter = bat_scores[i].findAll('td')
+				batsman_details.append(" ".join(batter[0].find('a')['href'].split('/')[-1].split('-')[:-1]))
+				batsman_details.append(batter[1].find('strong').text)
+				batsman_details.append(batter[2].text)
+				batsman_details.append(batter[3].text)
+				batsman_details.append(batter[4].text)
+			batting.append(batsman_details)
+
+	if len(matches_data) > 1:
+		bowl_scores = matches_data[1].findAll('tr')
+		for i in range(len(bowl_scores)):
+			bowler_details = []
+			if bowl_scores[i] != None:
+				bowler = bowl_scores[i].findAll('td')
+				bowler_details.append(" ".join(bowler[0].find('a')['href'].split('/')[-1].split('-')[:-1]))
+				bowler_details.append(bowler[1].text)
+				bowler_details.append(bowler[2].text)
+				bowler_details.append(bowler[3].text)
+				bowler_details.append(bowler[4].text)
+			bowling.append(bowler_details)
+
+	team_scores = live_score.find('div', class_ = "ds-flex ds-flex-col ds-mt-3 md:ds-mt-0 ds-mt-0 ds-mb-1").findAll('div', class_ = "ci-team-score")
+	team_updates = {}
+	if len(team_scores) > 0:
+		team1_name = team_scores[0].find('div', class_ = "ds-flex ds-items-center ds-min-w-0 ds-mr-1")['title']
+		if team_scores[0].find('span', class_ = "ds-text-compact-s ds-mr-0.5") != None:
+			t1_overs = team_scores[0].find('span', class_ = "ds-text-compact-s ds-mr-0.5").text
+		if team_scores[0].find('strong') != None:
+			t1_score = team_scores[0].find('strong').text
+		team_updates[team1_name] = [t1_overs, t1_score]
+		
+
+	if len(team_scores) > 1:
+		team2_name = team_scores[1].find('div', class_ = "ds-flex ds-items-center ds-min-w-0 ds-mr-1")['title']
+		t2_overs = None
+		t2_score = None
+		if team_scores[1].find('span', class_ = "ds-text-compact-s ds-mr-0.5") != None:
+			t2_overs = team_scores[1].find('span', class_ = "ds-text-compact-s ds-mr-0.5").text
+		if team_scores[1].find('strong') != None:
+			t2_score = team_scores[1].find('strong').text
+		team_updates[team2_name] = [t2_overs, t2_score]
+
+	context = {
+		'team_updates':team_updates,
+		'batting':batting,
+		'bowling':bowling,
+	}
+	
+	return render(request, 'core/live_score.html', context)
 
 
 

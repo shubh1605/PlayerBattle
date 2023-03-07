@@ -54,97 +54,26 @@
 
         <!-- Left side columns -->
         <div class="col-lg-8">
+          
             {% if is_match_live %}
             <div class="row">
               <div class="card">
                 <div class="card-body">
-                  <h5 class="card-title">Live Score <span>| Match Name </span> </h5>
-                  <div><span class="toss-span">Update</span></div>
-                  <div><span class="score-span">Score</span></div>
-                  <hr>
                   <div class="row">
-                    <div class="col-lg-6">
-                      <div class="title">
-                        Team Name <span>| Batting </span>
+                      <div class="col-9">
+                          <h5 class="card-title">Live Score <span>| {{ live_match_name|title }} </span></h5>
                       </div>
-                      <hr>
-                      <table class="table table-borderless">
-                        <thead>
-                          <tr class="score-row-title">
-                            <th>Batsman</th>
-                            <th>R</th>
-                            <th>B</th>
-                            <th>4s</th>
-                            <th>6s</th>
-                            <th>SR</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr class="score-row">
-                            <th>Kohli</th>
-                            <th>50</th>
-                            <th>50</th>
-                            <th>4</th>
-                            <th>2</th>
-                            <th>100</th>
-                          </tr>
-                          <tr class="score-row">
-                            <th>Kohli</th>
-                            <th>50</th>
-                            <th>50</th>
-                            <th>4</th>
-                            <th>2</th>
-                            <th>100</th>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                    <div class="col-lg-6">
-                      <div class="title">
-                        Team Name <span>| Bowling </span>
+                      <div class="col-3">
+                          <div id="refresh"><i class="bi bi-arrow-clockwise refresh-icon"></i></div>
                       </div>
-                      <hr>
-                      <table class="table table-borderless">
-                        <thead>
-                          <tr class="score-row-title">
-                            <th>Bowler</th>
-                            <th>O</th>
-                            <th>M</th>
-                            <th>R</th>
-                            <th>W</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr class="score-row">
-                            <th>Bumrah</th>
-                            <th>4</th>
-                            <th>0</th>
-                            <th>20</th>
-                            <th>2</th>
-                          </tr>
-                          <tr class="score-row">
-                            <th>Bumrah</th>
-                            <th>4</th>
-                            <th>0</th>
-                            <th>20</th>
-                            <th>2</th>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
                   </div>
-                  {% comment %} <div class="activity">
-                    <div class="activity-item d-flex">
-                      <div class="activite-label">32 min</div>
-                      <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
-                      <div class="activity-content">
-                        Quia quae rerum <a href="#" class="fw-bold text-dark">explicabo officiis</a> beatae
-                      </div>
-                    </div>
-                  </div> {% endcomment %}
+                  <div id="live-score-div"></div>
                 </div>
               </div>
             </div>
+
+
+              
             {% endif %}
 
 
@@ -305,28 +234,32 @@
                 </div>
               </div>
             </div>
-
-
         </div><!-- End Right side columns -->
       </div>
     </section>
-
   </main><!-- End #main -->
 
-  {% comment %} <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
-  <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src='https://cdn.rawgit.com/pguso/jquery-plugin-circliful/master/js/jquery.circliful.min.js'></script>
+  <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
 
   <script>
-    $(document).ready(function () {
-      console.log("hi")
-      $('#user_points').dataTable({
-        "paging": false
-      });
-
-      $('#player_points').dataTable({
-        "paging": false
-      });
+    $(document).ready(function(){
+      get_live_score()
     });
-  </script> {% endcomment %}
+    document.getElementById("refresh").onclick = function(){
+      get_live_score();
+    }
+
+    function get_live_score(){
+      $.ajax({
+        type:"GET",
+        url: "{% url 'get-live-score' live_match_id %}",
+        success: function(data){
+          $('#live-score-div').html(data);
+        }
+      })
+    }
+  </script>
 
 {% endblock %}

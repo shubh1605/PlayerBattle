@@ -33,9 +33,19 @@
     font-family: "Poppins", sans-serif;
 }
 
+.refresh-icon{
+  text-align: right;
+  color: black;
+  font-size: 24px;
+}
+
+.score-hr {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
 .score-span {
   color: #012970;
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 500;
   font-family: "Poppins", sans-serif;
 }
@@ -56,6 +66,11 @@
     font-size: 14px;
     font-weight: 400;
     font-family: "Poppins", sans-serif;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+
 }
 
 marquee{
@@ -64,6 +79,7 @@ marquee{
   color: #012970;
   font-family: "Poppins", sans-serif;
   border: 1px solid blacks;
+  
 }
 
 .marquee-hr{

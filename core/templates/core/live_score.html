@@ -1,0 +1,71 @@
+              
+        {% for key,values in team_updates.items %}
+            <div class="row">
+                <div class="col-lg-3"><div><span class="score-span">{{ key }} </span></div></div>
+                {% if values.0 != none and values.1 != none %}
+                    <div class="col-lg-3"><div><span class="toss-span">{{ values.1 }} {{ values.0 }}</span></div></div>
+                {% endif %}
+            </div>           
+        {% endfor %}
+        
+        <hr class="score-hr">
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="title">
+               Batting 
+            </div>
+            <hr class="score-hr">
+            <table class="table table-borderless">
+              <thead>
+                <tr class="score-row-title">
+                  <th>Batsman</th>
+                  <th>R</th>
+                  <th>B</th>
+                  <th>4s</th>
+                  <th>6s</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for batsman in batting %}
+                <tr class="score-row">
+                  <th>{{ batsman.0|title }}</th>
+                  <th>{{ batsman.1 }}</th>
+                  <th>{{ batsman.2 }}</th>
+                  <th>{{ batsman.3 }}</th>
+                  <th>{{ batsman.4 }}</th>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="col-lg-6">
+            <div class="title">
+              Bowling
+            </div>
+            <hr class="score-hr">
+            <table class="table table-borderless">
+              <thead>
+                <tr class="score-row-title">
+                  <th>Bowler</th>
+                  <th>O</th>
+                  <th>M</th>
+                  <th>R</th>
+                  <th>W</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for bowler in bowling %}
+                <tr class="score-row">
+                  <th>{{ bowler.0|title }}</th>
+                  <th>{{ bowler.1 }}</th>
+                  <th>{{ bowler.2 }}</th>
+                  <th>{{ bowler.3 }}</th>
+                  <th>{{ bowler.4 }}</th>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+      

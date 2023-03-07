@@ -23,4 +23,5 @@ urlpatterns = [
     path('edit-captain/',edit_captain, name='edit-captain'),
     path('edit-vice-captain/',edit_vice_captain, name='edit-vice-captain'),
     path('search-user/',search_user, name='search-user'),
+    path('get-live-score/<id>',get_live_score, name='get-live-score'),
 ]

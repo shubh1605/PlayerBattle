@@ -92,8 +92,16 @@ def end_match(request):
 				return HttpResponseRedirect(reverse('admin-func'))
 
 			i = 1
+			player_rank = 1
+			prev_score = 0
+
 			for user_profile in user_profiles:
-				user_profile.rank = i
+				if prev_score == user_profile.total_score:					
+					user_profile.rank = player_rank
+				else:
+					prev_score = user_profile.total_score 
+					user_profile.rank = i
+					player_rank = i
 				user_profile.save()
 				i += 1
 

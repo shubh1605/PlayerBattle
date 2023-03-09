@@ -419,14 +419,14 @@ def register(request):
 		if password1 == password2:
 			if (reference in all_usernames) or reference=="" :
 				try:
-					new_user = User.objects.create_user(first_name=first_name,last_name=last_name,username=username,password=password1,is_active=False)
+					new_user = User.objects.create_user(first_name=first_name,last_name=last_name,username=username,password=password1,is_active=True)
 					new_user.save()
 					prof = Profile.objects.get(user=new_user)
 					prof.contact_no = number
 					prof.reference = reference
 					prof.save()
 					messages.success(request, "Profile created, kindly pay on UPI ID - 9819340022@paytm" )
-					messages.success(request, "Admin will activate your account within 24 hours of payment.")
+					# messages.success(request, "Admin will activate your account within 24 hours of payment.")
 					return redirect("login")
 				except:
 					messages.error(request, "Username already taken!" )

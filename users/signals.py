@@ -14,7 +14,7 @@ def create_profile(sender, instance, created, **kwargs):
 def save_profile(sender, instance, **kwargs):
     instance.profile.save()
 
-@receiver(post_save, sender=User)
-def user_to_inactive(sender, instance, created, update_fields, **kwargs):
-    if created:
-        instance.is_active = False
+# @receiver(post_save, sender=User)
+# def user_to_inactive(sender, instance, created, update_fields, **kwargs):
+#     if created:
+#         instance.is_active = False

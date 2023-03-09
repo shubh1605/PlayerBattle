@@ -419,8 +419,9 @@ def register(request):
 		if password1 == password2:
 			if (reference in all_usernames) or reference=="" :
 				try:
-					new_user = User.objects.create_user(first_name=first_name,last_name=last_name,username=username,password=password1,is_active=True)
+					new_user = User.objects.create_user(first_name=first_name,last_name=last_name,username=username,password=password1)
 					new_user.save()
+					print(new_user.is_active)
 					prof = Profile.objects.get(user=new_user)
 					prof.contact_no = number
 					prof.reference = reference

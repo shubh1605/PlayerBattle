@@ -37,6 +37,10 @@
 text-align: right;
 color: black;
 font-size: 24px;
+position: relative;
+top: 8px;
+left: auto;
+right: 0px;
 }
 
 .score-hr {
@@ -70,7 +74,14 @@ font-family: "Poppins", sans-serif;
   margin-bottom: 2px;
   padding-top: 0px;
   padding-bottom: 0px;
+}
 
+#loading {
+display: block;  
+margin-left: auto;
+margin-right: auto;
+height: 32px;
+width: 32px;
 }
 
 marquee{

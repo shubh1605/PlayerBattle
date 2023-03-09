@@ -60,14 +60,19 @@
               <div class="card">
                 <div class="card-body">
                   <div class="row">
-                      <div class="col-9">
+                      <div class="col-11">
                           <h5 class="card-title">Live Score <span>| {{ live_match_name|title }} </span></h5>
+                          
                       </div>
-                      <div class="col-3">
+                      <div class="col-1">
                           <div id="refresh"><i class="bi bi-arrow-clockwise refresh-icon"></i></div>
                       </div>
                   </div>
-                  <div id="live-score-div"></div>
+                  <div >
+                    <img id="loading" src="{% static 'core/assets/img/loading.gif' %}" />
+                  </div>
+                  <div id="live-score-div">
+                  </div>
                 </div>
               </div>
             </div>
@@ -252,6 +257,14 @@
     }
 
     function get_live_score(){
+      $("#loading").bind('ajaxStart', function(){
+        $(this).show();
+        $("#live-score-div").hide();
+      }).bind('ajaxStop', function(){
+        $(this).hide();
+        $("#live-score-div").show();
+    });
+      
       $.ajax({
         type:"GET",
         url: "{% url 'get-live-score' live_match_id %}",

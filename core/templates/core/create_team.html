@@ -100,7 +100,7 @@
         </div>
       </div>
 
-      <div class="col-lg-4">
+      <div class="col-lg-6">
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Your Bonus Matches <span>(Select 3)  </span> </h5> 
@@ -109,9 +109,9 @@
                 <select id="selected_matches" multiple data-allow-clear="1" placeholder="  Choose Matches" class="form-select" name="matches" aria-label="State" required>
                   {% for match in all_matches %}
                     {% if match.id in selected_matches %}
-                      <option class="selected_players_class" selected value={{ match.id }}>{{ match.name|title }}</option>
+                      <option class="selected_players_class" selected value={{ match.id }}>{{ match.name|title }} <span> ({{ match.date }})</span> </option>
                     {% else %}
-                      <option class="selected_players_class" value={{ match.id }}>{{ match.name|title }}</option>
+                      <option class="selected_players_class" value={{ match.id }}>{{ match.name|title }} <span>({{ match.date }})</span> </option>
                     {% endif %}
                   {% endfor %}
                 </select>
@@ -122,7 +122,7 @@
         </div>
       </div>
 
-      <div class="col-lg-4">
+      <div class="col-lg-3">
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Predict Orange Cap winner <span>(100 Pts) </span> </h5> 
@@ -146,7 +146,7 @@
         </div>
       </div>
 
-      <div class="col-lg-4">
+      <div class="col-lg-3">
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Predict Purple Cap winner <span>(100 Pts) </span> </h5> 

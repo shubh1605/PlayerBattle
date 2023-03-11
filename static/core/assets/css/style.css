@@ -1310,6 +1310,29 @@ h6 {
   font-weight: 600;
 }
 
+#team_details_span{
+  color: #899bbd;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.instructions{
+  /* padding: 15px 0 15px 0; */
+  font-size: 14px;
+  font-weight: 500;
+  color: #012970;
+  font-family: "Poppins", sans-serif;
+}
+
+.important-instruction{
+  font-size: 14px;
+  font-weight: 500;
+  color: red;
+  font-family: "Poppins", sans-serif;
+}
+
+/* end create team style */
+
 .required {
   color: #ed3c0d;
   text-align: left;

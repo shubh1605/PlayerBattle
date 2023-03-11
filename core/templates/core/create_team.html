@@ -1,7 +1,5 @@
 {% extends 'core/base.html' %}
 {% load static %}
-
-
 {% block style %}
   <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
   <link href="https://raw.githack.com/ttskch/select2-bootstrap4-theme/master/dist/select2-bootstrap4.css" rel="stylesheet"> <!-- for live demo page --> 
@@ -59,7 +57,23 @@
       </nav>
     </div><!-- End Page Title -->
 
+    
+
     <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Instructions</h5>
+              <ul class="instructions">
+                <li>Make a team of 15 players, including a captain and a vice-captain.</li>
+                <li>Choose 3 matches from the league match as your bonus matches. The points of all players involved in the bonus match will be doubled.</li>
+                <li>Predict the orange and purple cap winners of the IPL 2023. Each right prediction earns 100 points.</li>
+              </ul>
+              <div class="important-instruction">Note - You cannot select more than 2 players from the same team.</div>
+              <div class="important-instruction">Note - You cannot change the players on your team. Although you can only change your captain and vice-captain ONCE during the season.</div>
+            </div>
+        </div>
+      </div>
       <form class="row g-3 needs-validation" method="POST" action="{% url 'create-team' %}"  id="create_team_form" >
       {% csrf_token %}
       <div class="col-lg-6">

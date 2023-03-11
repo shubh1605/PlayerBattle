@@ -54,6 +54,36 @@
 
         <!-- Left side columns -->
         <div class="col-lg-8">  
+
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">How to win rewards?</h5>
+              <ol class="instructions">
+                <li>Register yourself on the portal and create your fantasy team.</li>
+                <li>Predict daily match outcomes to earn cashback incentives.</li>
+                <li>Participate in entertaining weekly events to receive surprises.</li>
+              </ol>
+
+              <h5 class="card-title">Points system</h5>
+              <ol class="instructions">
+                <li>A player receives 1 point for every run that is scored.</li>
+                <li>A player receives 25 points for every wicket that is taken.</li>
+                <li>Each point earned by your team's captain will be multiplied by 2.</li>
+                <li>Each point earned by your team's vice-captain will be multiplied by 1.5.</li>
+                <li>Each point earned by your player in a bonus match will be multiplied by 2.</li>
+                <li>Correctly predict a team to win the game to earn 20 points, while predict a tie to earn 75 points.</li>
+              </ol>
+
+              <h5 class="card-title">Daily prediction</h5>
+              <ol class="instructions">
+                <li>Maintain a streak of 5 correct prediction and receive Rs 100/- cashback.</li>
+                <li>If you incorrectly predict a game, you will restart at 0.</li>
+                <li>If you miss a game, you will restart at 0.</li>
+                <li>If a match is abandoned, streaks of users who made predictions will be kept; everyone else will have to start over at 0.</li>
+              </ol>
+            </div>
+          </div>
+
           <!-- Recent Activity -->
           <div class="card">
             <div class="filter">
@@ -67,10 +97,12 @@
                 </li>
               </ul>
             </div>
-
             <div class="card-body .d-sm-none .d-xs-none">
               <h5 class="card-title">Recent Notifications </h5>
               <div class="activity notification-class">
+                {% if notifications|length == 0 %}
+                  <h5>No notifications yet!</h5>
+                {% endif %}
                 {% for notification in notifications|slice:"3" %}
                   <div class="activity-item d-flex">
                     <div class="activite-label">{{ notification.subject }}</div>
@@ -81,9 +113,10 @@
                   </div><!-- End activity item-->    
                 {% endfor %}        
               </div>
-
             </div>
-          </div><!-- End Recent Activity -->      
+          </div><!-- End Recent Activity -->           
+
+
             {% if is_match_live %}
               <div class="row">
                 <div class="card">

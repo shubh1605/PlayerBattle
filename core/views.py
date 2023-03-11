@@ -11,7 +11,7 @@ import requests
 import json
 
 
-from core.models import Change, Match, Player, Variable
+from core.models import Change, Match, Player, Variable, Notification
 from users.models import Profile
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate, logout
@@ -69,12 +69,14 @@ def end_match(request):
 			for player in points:
 				if Player.objects.filter(name=player).exists():
 					p = Player.objects.get(name=player)
-					p.matches.add(live_match)
-					p.total_points += points[player][2]
-					p.bowl_points += points[player][1]
-					p.bat_points += points[player][0]
-					p.save()
-					live_match.players.add(p)
+					
+					if live_match not in p.matches.all():
+						p.matches.add(live_match)
+						p.total_points += points[player][2]
+						p.bowl_points += points[player][1]
+						p.bat_points += points[player][0]
+						p.save()
+						live_match.players.add(p)
 				else:
 					p = Player(name=player)
 					p.total_points = points[player][2]
@@ -85,7 +87,7 @@ def end_match(request):
 					p.matches.add(live_match)
 					p.save()
 					live_match.players.add(p)
-			# print(points)
+		
 			user_profiles =  Profile.objects.filter(user__in= User.objects.filter(is_active=True, is_superuser = False)).order_by('-total_score')
 			no_error = allot_points_to_user(points, live_match, result)
 			if no_error:
@@ -119,90 +121,120 @@ def end_match(request):
 			return HttpResponse("Not a super user")
 	else:
 			return HttpResponse("Login")
+	
+def update_streak(user, curr_streak, has_predicted_correct):
+	# print(user.user.username, curr_streak, has_predicted_correct)
+	if has_predicted_correct:
+		if curr_streak == 4:
+			curr_streak += 1
+			new_notification = Notification()
+			new_notification.user = user.user
+			new_notification.subject = "Streak"
+			new_notification.description = f'{user.user.username} has completed a streak of 5.'
+			new_notification.save()
+			return curr_streak
+		elif curr_streak == 5:
+			curr_streak = 1
+			return curr_streak
+		else:
+			curr_streak += 1
+			return curr_streak
+	else:
+		return 0
+
 
 def allot_points_to_user(match_points, match, result):
 	user_profiles =  Profile.objects.filter(user__in= User.objects.filter(is_active=True, is_superuser = False))
 	for user_profile in user_profiles:
 		try:
-			user_matches = user_profile.matches.all()
-			user_players =  user_profile.players.all()
-			user_total_points = user_profile.total_score
-			user_captain = user_profile.captain.name
-			user_vicecaptain = user_profile.vice_captain.name
-			user_predictions = json.loads(user_profile.daily_prediction)
-			user_prediction_score = user_profile.prediction_score
-			match_bonus = 1
-			user_points = json.loads(user_profile.points)
 			description = json.loads(user_profile.points_description)
-			description[match.id] = {}
-			user_match_players = {}
-			user_match_info = {}
-			user_match_info['captain'] = user_captain
-			user_match_info['vice_captain'] = user_vicecaptain
-			user_match_info['match_id'] = match.id
-			user_match_info['matchName'] = match.name
-			match_id = match.id
-			total = [0.0,0.0,0.0]
-			user_match_info['match_prediction'] = 0
-			if str(match_id) in user_predictions.keys():
-				# print("if")
-				if result == "no result":
-					# print("no result")
-					user_prediction_score += 0
-					user_match_info['match_prediction'] = 0
-				elif result == user_predictions[str(match_id)] and result == "tie":
-					# print("predicted tie")
-					user_prediction_score += 75
-					total[2] += 75.0
-					user_total_points += 75.0
-					user_match_info['match_prediction'] = 75.0
-				elif result == user_predictions[str(match_id)] and result != "tie":
-					# print("not predicted tie")
-					user_prediction_score += 20
-					total[2] += 20.0
-					user_total_points += 20.0
-					user_match_info['match_prediction'] = 20.0
-			# print(user_match_info)
-			user_profile.prediction_score = user_prediction_score
 
-			if match in user_matches:
-				match_bonus = 2
-				user_match_info['is_match_bonus'] = True
+			# checking if this match points have been added to the user or not
+			if str(match.id) in description.keys():
+				continue
 			else:
-				user_match_info['is_match_bonus'] = False
+				user_matches = user_profile.matches.all()
+				user_players =  user_profile.players.all()
+				user_total_points = user_profile.total_score
+				user_captain = user_profile.captain.name
+				user_vicecaptain = user_profile.vice_captain.name
+				user_predictions = json.loads(user_profile.daily_prediction)
+				user_prediction_score = user_profile.prediction_score
+				match_bonus = 1
+				user_points = json.loads(user_profile.points)
+				description[match.id] = {}
+				user_match_players = {}
+				user_match_info = {}
+				user_match_info['captain'] = user_captain
+				user_match_info['vice_captain'] = user_vicecaptain
+				user_match_info['match_id'] = match.id
+				user_match_info['matchName'] = match.name
+				match_id = match.id
+				total = [0.0,0.0,0.0]
+				user_match_info['match_prediction'] = 0
+				curr_streak = user_profile.prediction_streak
 
-			for player in user_players:
-				if(player.name in match_points):
-					user_match_players[player.name] = [0.0,0.0,0.0]
-					if player.name not in user_points:
-						user_points[player.name] = [0.0,0.0,0.0]
-					if(player.name == user_captain):
-						user_total_points += (match_points[player.name][2] * 2 * match_bonus)
-						for i in range(3):
-							user_points[player.name][i] += (match_points[player.name][i] * 2 * match_bonus)
-							total[i] += (match_points[player.name][i] * 2 * match_bonus)
-							user_match_players[player.name][i] = (match_points[player.name][i] * 2 * match_bonus)
+				# Giving prediction points
+				if str(match_id) in user_predictions.keys():
+					if result == "no result":
+						user_prediction_score += 0
+						user_match_info['match_prediction'] = 0
+					elif result == user_predictions[str(match_id)] and result == "tie":
+						user_profile.prediction_streak = update_streak(user_profile, curr_streak, True)
+						user_prediction_score += 75
+						total[2] += 75.0
+						user_total_points += 75.0
+						user_match_info['match_prediction'] = 75.0
+					elif result == user_predictions[str(match_id)] and result != "tie":
+						user_profile.prediction_streak = update_streak(user_profile, curr_streak, True)					
+						user_prediction_score += 20
+						total[2] += 20.0
+						user_total_points += 20.0	
+						user_match_info['match_prediction'] = 20.0
+					elif result != user_predictions[str(match_id)]:
+						user_profile.prediction_streak = update_streak(user_profile, curr_streak, False)
+				else:
+					user_profile.prediction_streak = update_streak(user_profile, curr_streak, False)
 
-					elif(player.name == user_vicecaptain):
-						user_total_points += (match_points[player.name][2] * 1.5 * match_bonus)
-						for i in range(3):
-							user_points[player.name][i] += (match_points[player.name][i] * 1.5 * match_bonus)
-							total[i] += (match_points[player.name][i] * 1.5 * match_bonus)
-							user_match_players[player.name][i] = (match_points[player.name][i] * 1.5 * match_bonus)
-					else:
-						user_total_points += (match_points[player.name][2] * match_bonus)
-						for i in range(3):
-							user_points[player.name][i] += (match_points[player.name][i] * match_bonus)
-							total[i] += (match_points[player.name][i] * match_bonus)
-							user_match_players[player.name][i] = (match_points[player.name][i] * match_bonus)
+				user_profile.prediction_score = user_prediction_score
+				if match in user_matches:
+					match_bonus = 2
+					user_match_info['is_match_bonus'] = True
+				else:
+					user_match_info['is_match_bonus'] = False
 
-			user_match_info['total'] = total
-			description[match.id]['Players'] = user_match_players
-			description[match.id]['Info'] = user_match_info
-			user_profile.points_description = json.dumps(description)
-			user_profile.total_score = user_total_points
-			user_profile.points = json.dumps(user_points)
-			user_profile.save()
+				for player in user_players:
+					if(player.name in match_points):
+						user_match_players[player.name] = [0.0,0.0,0.0]
+						if player.name not in user_points:
+							user_points[player.name] = [0.0,0.0,0.0]
+						if(player.name == user_captain):
+							user_total_points += (match_points[player.name][2] * 2 * match_bonus)
+							for i in range(3):
+								user_points[player.name][i] += (match_points[player.name][i] * 2 * match_bonus)
+								total[i] += (match_points[player.name][i] * 2 * match_bonus)
+								user_match_players[player.name][i] = (match_points[player.name][i] * 2 * match_bonus)
+
+						elif(player.name == user_vicecaptain):
+							user_total_points += (match_points[player.name][2] * 1.5 * match_bonus)
+							for i in range(3):
+								user_points[player.name][i] += (match_points[player.name][i] * 1.5 * match_bonus)
+								total[i] += (match_points[player.name][i] * 1.5 * match_bonus)
+								user_match_players[player.name][i] = (match_points[player.name][i] * 1.5 * match_bonus)
+						else:
+							user_total_points += (match_points[player.name][2] * match_bonus)
+							for i in range(3):
+								user_points[player.name][i] += (match_points[player.name][i] * match_bonus)
+								total[i] += (match_points[player.name][i] * match_bonus)
+								user_match_players[player.name][i] = (match_points[player.name][i] * match_bonus)
+
+				user_match_info['total'] = total
+				description[match.id]['Players'] = user_match_players
+				description[match.id]['Info'] = user_match_info
+				user_profile.points_description = json.dumps(description)
+				user_profile.total_score = user_total_points
+				user_profile.points = json.dumps(user_points)
+				user_profile.save()
 		except Exception as e:
 			print(e)
 			print("error",user_profile)
@@ -244,6 +276,7 @@ def home_page(request):
 	best_batsman = players.order_by('-bat_points').values()[0]
 	best_bowler = players.order_by('-bowl_points').values()[0]
 	variable =  Variable.objects.all()[0]
+	notifications = Notification.objects.order_by('-created_at')
 	is_match_live = variable.is_any_match_live
 	live_match_id = None
 	live_match_name = None
@@ -278,6 +311,7 @@ def home_page(request):
 		'new_predictions':new_predictions,
 		'live_match_id':live_match_id,
 		'live_match_name':live_match_name,
+		'notifications':notifications,
 	}
 	return render(request, 'core/home_page.html', context)
 

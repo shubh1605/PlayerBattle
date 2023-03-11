@@ -53,32 +53,58 @@
       <div class="row">
 
         <!-- Left side columns -->
-        <div class="col-lg-8">
-          
-            {% if is_match_live %}
-            <div class="row">
-              <div class="card">
-                <div class="card-body">
-                  <div class="row">
-                      <div class="col-11">
-                          <h5 class="card-title">Live Score <span>| {{ live_match_name|title }} </span></h5>
-                          
-                      </div>
-                      <div class="col-1">
-                          <div id="refresh"><i class="bi bi-arrow-clockwise refresh-icon"></i></div>
-                      </div>
-                  </div>
-                  <div >
-                    <img id="loading" src="{% static 'core/assets/img/loading.gif' %}" />
-                  </div>
-                  <div id="live-score-div">
-                  </div>
-                </div>
-              </div>
+        <div class="col-lg-8">  
+          <!-- Recent Activity -->
+          <div class="card">
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <li class="dropdown-header text-start">
+                  <h6 style="cursor:pointer" onclick="viewAllNotifications()">View all</h6>
+                </li>
+                <li class="dropdown-header text-start">
+                  <h6 style="cursor:pointer" onclick="viewLessNotifications()">View less</h6>
+                </li>
+              </ul>
             </div>
 
+            <div class="card-body .d-sm-none .d-xs-none">
+              <h5 class="card-title">Recent Notifications </h5>
+              <div class="activity notification-class">
+                {% for notification in notifications|slice:"3" %}
+                  <div class="activity-item d-flex">
+                    <div class="activite-label">{{ notification.subject }}</div>
+                    <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
+                    <div class="activity-content">
+                      {{ notification.description }}
+                    </div>
+                  </div><!-- End activity item-->    
+                {% endfor %}        
+              </div>
 
-              
+            </div>
+          </div><!-- End Recent Activity -->      
+            {% if is_match_live %}
+              <div class="row">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="row">
+                        <div class="col-11">
+                            <h5 class="card-title">Live Score <span>| {{ live_match_name|title }} </span></h5>
+                            
+                        </div>
+                        <div class="col-1">
+                            <div id="refresh"><i class="bi bi-arrow-clockwise refresh-icon"></i></div>
+                        </div>
+                    </div>
+                    <div >
+                      <img id="loading" src="{% static 'core/assets/img/loading.gif' %}" />
+                    </div>
+                    <div id="live-score-div">
+                    </div>
+                  </div>
+                </div>
+              </div>              
             {% endif %}
 
 
@@ -195,7 +221,6 @@
 
         <!-- Right side columns -->
         <div class="col-lg-4">
-
           <!-- Sales Card -->
             <div class="card info-card sales-card">
               <div class="card-body">
@@ -250,11 +275,51 @@
 
   <script>
     $(document).ready(function(){
-      get_live_score()
+      if("{{ is_match_live }}" == "True"){
+        get_live_score()
+      }
+      
     });
-    document.getElementById("refresh").onclick = function(){
-      get_live_score();
+    if("{{ is_match_live }}" == "True"){
+      document.getElementById("refresh").onclick = function(){
+        get_live_score();
+      }
     }
+
+    function viewAllNotifications(){
+      var all_notification = `{% for notification in notifications %}
+                            <div class="activity-item d-flex">
+                              <div class="activite-label">{{ notification.subject }}</div>
+                              <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
+                              <div class="activity-content">
+                                {{ notification.description }}
+                              </div>
+                            </div><!-- End activity item-->    
+                          {% endfor %}`
+      all_noti_class = document.getElementsByClassName("activity notification-class");
+      for(var i = 0; i<all_noti_class.length; i++){
+        console.log(all_noti_class[i])
+        all_noti_class[i].innerHTML = all_notification
+      }
+    }
+
+    function viewLessNotifications(){
+      var all_notification = `{% for notification in notifications|slice:"3" %}
+                            <div class="activity-item d-flex">
+                              <div class="activite-label">{{ notification.subject }}</div>
+                              <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
+                              <div class="activity-content">
+                                {{ notification.description }}
+                              </div>
+                            </div><!-- End activity item-->    
+                          {% endfor %}`
+      all_noti_class = document.getElementsByClassName("activity notification-class");
+      for(var i = 0; i<all_noti_class.length; i++){
+        console.log(all_noti_class[i])
+        all_noti_class[i].innerHTML = all_notification
+      }
+    }
+    
 
     function get_live_score(){
       $("#loading").bind('ajaxStart', function(){

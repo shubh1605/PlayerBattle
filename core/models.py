@@ -45,3 +45,11 @@ class Change(models.Model):
     def __str__(self):
         return f'{self.user} - {self.date}' 
     
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    description = models.CharField(max_length=100)
+    subject = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+            return f'{self.user} - {self.subject}' 

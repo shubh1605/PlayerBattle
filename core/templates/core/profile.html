@@ -56,19 +56,27 @@
         <div class="col-xl-4">
 
           <div class="row">
-            <div class="col-6">
+            <div class="col-12">
               <div class="card">
                 <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
-                  <h2>{{ profile_viewing.rank }}</h2>
-                  <h6> {% if viewing_another_profile %} {{ profile_viewing.user.username }} {% else %} Your {% endif %} Rank</h6>
+                  <h2>{{ profile_viewing.total_score }}</h2>
+                  <h6> {% if viewing_another_profile %} {{ profile_viewing.user.username }} {% else %} Your {% endif %} score</h6>
                 </div>
               </div>
             </div>
             <div class="col-6">
               <div class="card">
                 <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
-                  <h2>{{ profile_viewing.total_score }}</h2>
-                  <h6> {% if viewing_another_profile %} {{ profile_viewing.user.username }} {% else %} Your {% endif %} Score</h6>
+                  <h2>{{ profile_viewing.rank }} <i class="bi bi-award"></i></h2>
+                  <h6> {% if viewing_another_profile %} {{ profile_viewing.user.username }} {% else %} Your {% endif %} rank</h6>
+                </div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="card">
+                <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+                  <h2>{{ profile_viewing.prediction_streak }} <i class="bi bi-fire"></i></h2>
+                  <h6> {% if viewing_another_profile %} {{ profile_viewing.user.username }} {% else %} Your {% endif %} streak</h6>
                 </div>
               </div>
             </div>
@@ -77,14 +85,14 @@
           <div class="card">
             <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
               <h2>{{ profile_viewing.captain.name|title }}</h2>
-              <h6> {% if viewing_another_profile %} {{ profile_viewing.user.username }}'s {% else %} Current {% endif %} Captain</h6>
+              <h6> {% if viewing_another_profile %} {{ profile_viewing.user.username }}'s {% else %} Current {% endif %} captain</h6>
             </div>
           </div>
 
           <div class="card">
             <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
               <h2>{{ profile_viewing.vice_captain.name|title }}</h2>
-              <h6> {% if viewing_another_profile %} {{ profile_viewing.user.username }}'s {% else %} Current {% endif %} Vice Captain</h6>
+              <h6> {% if viewing_another_profile %} {{ profile_viewing.user.username }}'s {% else %} Current {% endif %} vice captain</h6>
             </div>
           </div>
 
@@ -169,7 +177,6 @@
                     <table class="table table-hover">
                       <thead>
                         <tr>
-                          <th scope="col">Sr. No.</th>
                           <th scope="col">Match</th>
                           <th scope="col">Date</th>
                           <th scope="col">Status</th>
@@ -178,13 +185,12 @@
                       <tbody>
                          {% for match in profile_viewing_matches %}
                           <tr>
-                            <td class="table-content">{{ forloop.counter }}</td>
                             <td class="table-content">{{ match.name|title }}</td>
-                            <td class="table-content"></td>
+                            <td class="table-content">{{ match.date }}</td>
                             {% if match.has_completed %}
-                              <td class="table-content"><span class="badge bg-success">Completed</span></td>
+                              <td class="table-content"><span class="badge bg-success">C</span></td>
                             {% else %}
-                              <td class="table-content"><span class="badge bg-info">Pending</span></td>
+                              <td class="table-content"><span class="badge bg-info">P</span></td>
                             {% endif %}
                           </tr>
                         {% endfor %}         

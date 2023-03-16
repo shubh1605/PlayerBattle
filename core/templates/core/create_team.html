@@ -62,6 +62,7 @@
     <div class="row">
       <div class="col-lg-12">
         <div class="card">
+          
             <div class="card-body">
               <h5 class="card-title">Instructions</h5>
               <ul class="instructions">
@@ -77,37 +78,70 @@
       <form class="row g-3 needs-validation" method="POST" action="{% url 'create-team' %}"  id="create_team_form" >
       {% csrf_token %}
       <div class="col-lg-6">
+        
         <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Choose your players <span>(Select 15) </span> </h5>
-            <span id="team_details_span"></span>
-            <div class="col-md-12">
-              <div class="form-floating mt-3">
-                <select id="selected_players" multiple data-allow-clear="1" placeholder="  Choose Players" onchange="selectedPlayers()" class="form-select" name="players" aria-label="State" required>
-                  {% for key,value in team_wise_players.items %}  
-                    {% for player in value %}
-                      {% if player.id in selected_players %}
-                        <option class="selected_players_class" selected value={{ player.id }}>{{ player.name|title }} - {{ player.team_name|title }}</option>
-                      {% else %}
-                        <option class="selected_players_class" value={{ player.id }}>{{ player.name|title }} - {{ player.team_name|title }}</option>
-                      {% endif %}
-                      {% endfor %}
-                  {% endfor %}
+          <div class="card-body ">
+            <h5 class="card-title">Choose players</h5>
+
+            <div class="row">
+              <!-- <div class="circle">1</div> -->
+              <ul class="number" id="number-div">
+                {% for i in '012345678901234'|make_list %}
+                  <li class="empty">{{ forloop.counter }}</li>
+                  
+                {% endfor %}
+              </ul>
+            </div>
             
-                </select>
-                <div id="player_errors" class="error_messages" display="none"></div>
-                  {% comment %} <label for="floatingSelect">Choose Players</label>  {% endcomment %}
-              </div>
-            </div>   
+            <div id="player_errors" class="error_messages" display="none"></div>
+            <!-- Bordered Tabs Justified -->
+            <ul class="nav nav-tabs nav-tabs-bordered d-flex choose-players-ul" id="borderedTabJustified" role="tablist">       
+                {% for teams in team_wise_players|slice:"0:5" %}
+                  <li class="nav-item flex-fill choose-players-li" role="presentation">
+                    <button class="nav-link w-100" id="{{ teams.abbr }}-tab" data-bs-toggle="tab" data-bs-target="#{{ teams.team_id }}" type="button" role="tab" aria-controls="home" aria-selected="true">{{ teams.abbr|upper }} <span class="player_number_indicator">(0)<span></button>
+                  </li>
+                {% endfor %}     
+                {% for teams in team_wise_players|slice:"5:10" %}
+                  <li class="nav-item flex-fill choose-players-li" role="presentation">
+                    <button class="nav-link w-100" id="{{ teams.abbr }}-tab" data-bs-toggle="tab" data-bs-target="#{{ teams.team_id }}" type="button" role="tab" aria-controls="home" aria-selected="true">{{ teams.abbr|upper }} <span class="player_number_indicator">(0)<span></button>
+                  </li>
+                {% endfor %}
+            </ul>
+            <div class="tab-content pt-2" id="borderedTabJustifiedContent">
+              {% for teams in team_wise_players %}
+                <div class="tab-pane fade show" id="{{ teams.team_id }}" role="tabpanel" aria-labelledby="home-tab">
+                  <ul class="list-group team-list-ul">
+                    {% for player in teams.players %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center players-li {{ player.team_name }}-li">
+                      {{ player.name|title }}
+                      <span class="badge">
+                          <button id="player-id-{{ player.id }}" class="js-toggle-state || c-button-reset c-plus-to-check players-button {{ player.team_name }}-button" data-state="inactive" onclick="addPlayer({{ player.id }}, '{{ teams.name }}', '{{ player.name|title }}', '{{ teams.abbr }}')">
+                            <span class="c-plus-to-check__text">
+                              Add
+                            </span>
+                          </button>
+                      </span>
+                    </li>
+                    {% endfor %}
+                    
+                  </ul><!-- End List With badges -->
+                </div>
+                {% endfor %}
+            </div><!-- End Bordered Tabs Justified -->
+
           </div>
         </div>
       </div>
-
       <div class="col-lg-3">
         <div class="card">
           <div class="card-body">     
             <h5 class="card-title">Your captain <span>(x2 Pts) </span> </h5>                
             <div class="col-md-12">
+              <div style="display:none">
+                <select id="selected_players_hidden_list" multiple name="players">
+                </select>
+              </div>
+              
               <div class="form-floating mt-3">
                 <select id="select_captain"  data-allow-clear="1" placeholder=" Choose Captain"  class="form-select" name="captain" aria-label="State" onchange="selectedCaptain()" required> 
                 </select>
@@ -161,12 +195,12 @@
               <div class="form-floating mt-3">
                 <select id="selected_orange_cap" data-allow-clear="1" placeholder="  Predict Orange Cap Winner" class="form-select" name="orange_cap" aria-label="State" required>
                   <option disabled selected value> -- select an option -- </option>
-                  {% for key,value in team_wise_players.items %}  
-                    {% for player in value %}
+                  {% for team in team_wise_players %}  
+                    {% for player in team.players %}
                       {% if player.id == selected_orange_cap %}
                         <option class="selected_players_class" selected value={{ player.id }}>{{ player.name|title }}</option>
                       {% else %}
-                        <option class="selected_players_class"  value={{ player.id }}>{{ player.name|title }}</option>
+                        <option class="selected_players_class" value={{ player.id }}>{{ player.name|title }}</option>
                       {% endif %}
                     {% endfor %}
                   {% endfor %}
@@ -181,13 +215,12 @@
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Predict Purple Cap winner <span>(100 Pts) </span> </h5> 
-
             <div class="col-md-12">
               <div class="form-floating mt-3">
                 <select id="selected_purple_cap" data-allow-clear="1" placeholder="  Predict Purple Cap Winner" class="form-select" name="purple_cap" aria-label="State" required>
                   <option disabled selected value> -- select an option -- </option>
-                  {% for key,value in team_wise_players.items %}  
-                    {% for player in value %}
+                  {% for team in team_wise_players %}  
+                    {% for player in team.players %}
                       {% if player.id == selected_purple_cap %}
                         <option class="selected_players_class" selected value={{ player.id }}>{{ player.name|title }}</option>
                       {% else %}
@@ -218,17 +251,116 @@
 
     const MAX_PLAYERS = 15;
     const MAX_MATCHES = 3;
-    const MAX_PLAYERS_PER_TEAM = 3;
-    var MAX_PLAYERS_PER_TEAM_ERROR = false;
+    const MAX_PLAYERS_PER_TEAM = 2;
+    var selected_players = [];
+    var team_wise_player_count = {};
+    
+    {{ all_team_names|safe }}.forEach(item => {
+      // console.log(item)
+      team_wise_player_count[item] = 0;
+    })
+    
+    const buttons = document.querySelectorAll(".js-toggle-state");
+    
+    function arrayAlreadyHasArray(arr, testArr){
+        for(var i = 0; i<arr.length; i++){
+            let checker = []
+            for(var j = 0; j<arr[i].length; j++){
+                if(arr[i][j] === testArr[j]){
+                    checker.push(true)
+                } else {
+                    checker.push(false)
+                }
+            }
+            if (checker.every(check => check === true)){
+                return i
+            }
+        }
+        return -1;
+    }
+
+    function addPlayer(player_id, team_name, player_name, team_abbr){
+      event.preventDefault();
+      var p = [player_id, player_name]
+      if(!(team_name in team_wise_player_count)){
+        team_wise_player_count[team_name] = 0;
+      } 
+      var presence = arrayAlreadyHasArray(selected_players, p)
+      if(presence != -1){
+        selected_players.splice(presence,1)
+        team_wise_player_count[team_name] -= 1
+        event.srcElement.setAttribute('data-state','inactive');
+        event.preventDefault;
+        event.srcElement.disabled=false;  
+        var team_add_buttons = document.getElementsByClassName(team_name);
+        
+      } else {
+        selected_players.push(p)
+        team_wise_player_count[team_name] += 1
+        event.srcElement.setAttribute('data-state','active'); 
+      }
+      
+      document.getElementById(team_abbr+"-tab").innerHTML = team_abbr.toUpperCase() + " <span class='player_number_indicator'>("+team_wise_player_count[team_name]+")<span>"
+
+      if(selected_players.length == MAX_PLAYERS){
+        for(var button of document.getElementsByClassName("players-button")){
+          curr_state = button.getAttribute("data-state")
+          if(curr_state == "inactive"){
+            button.parentElement.parentElement.classList.add('disabled')
+          }
+        }
+      } else {   
+        for(const [key, value] of Object.entries(team_wise_player_count)){
+          if(value != MAX_PLAYERS_PER_TEAM){
+            for(var button of document.getElementsByClassName(key+"-button")){
+              button.parentElement.parentElement.classList.remove('disabled')
+          }
+          }
+        }
+        
+      }
+
+      if(team_wise_player_count[team_name] == MAX_PLAYERS_PER_TEAM || selected_players.length == MAX_PLAYERS){
+        for(var button of document.getElementsByClassName(team_name+"-button")){
+          curr_state = button.getAttribute("data-state")
+          if(curr_state == "inactive"){
+            button.parentElement.parentElement.classList.add('disabled')
+          }
+        }
+      } else {
+        for(var button of document.getElementsByClassName(team_name+"-button")){
+            button.parentElement.parentElement.classList.remove('disabled')
+        }
+      }
+
+      var number_html = ""
+      for(var i=1; i<=selected_players.length; i++){
+        number_html += "<li class='full'>"+i+"</li>";
+      }
+
+      for(var i=selected_players.length+1; i<=15; i++){
+        number_html += "<li class='empty'>"+i+"</li>";
+      }
+
+      document.getElementById("number-div").innerHTML = number_html;
+
+      var cap_options = "<option disabled selected value> -- select an option -- </option>"
+      for(var i=0; i<selected_players.length; i++){
+        cap_options += "<option value="+ selected_players[i][0] +">"+selected_players[i][1]+"</option>"
+      }
+      document.getElementById("select_captain").innerHTML = cap_options;
+      document.getElementById("select_vice_captain").innerHTML = cap_options;
+
+    }
 
     function selectedCaptain() {
       var selected_option = document.getElementById("select_captain");
       var selected_captain = selected_option.value;
-      selected_players = [];
-      for (var option of document.getElementById('selected_players').options)
+      var selected_players_excluding_captain = [];
+      for (var player of selected_players)
       {
-          if (option.selected && option.value != selected_captain) {
-            selected_players.push([option.value, option.text]);
+          if ( player[0] != selected_captain) {
+            selected_players_excluding_captain.push([player[0], player[1]]);
           }
       }
 
@@ -236,8 +368,8 @@
       var selected_vice_captain = selected_vice_option.value;
 
       var cap_options = ""
-      for(var i=0; i<selected_players.length; i++){
-        cap_options += "<option value="+ selected_players[i][0] +">"+selected_players[i][1]+"</option>"
+      for(var i=0; i<selected_players_excluding_captain.length; i++){
+        cap_options += "<option value="+ selected_players_excluding_captain[i][0] +">"+selected_players_excluding_captain[i][1]+"</option>"
       }
       document.getElementById("select_vice_captain").innerHTML = cap_options; 
       document.getElementById("select_vice_captain").value = selected_vice_captain; 
@@ -247,79 +379,34 @@
     function selectedViceCaptain() {
       var selected_option = document.getElementById("select_vice_captain");
       var selected_vice_captain = selected_option.value;
-      selected_players = [];
-      for (var option of document.getElementById('selected_players').options)
+      var selected_players_excluding_vice_captain = [];
+      for (var player of selected_players)
       {
-          if (option.selected && option.value != selected_vice_captain) {
-            selected_players.push([option.value, option.text]);
+          if ( player[0] != selected_vice_captain) {
+            selected_players_excluding_vice_captain.push([player[0], player[1]]);
           }
       }
 
       var selected_captain_option = document.getElementById("select_captain");
       var selected_captain = selected_captain_option.value;
 
-      var cap_options = ""
-      for(var i=0; i<selected_players.length; i++){
-        cap_options += "<option value="+ selected_players[i][0] +">"+selected_players[i][1]+"</option>"
+      var cap_options = "<option disabled selected value> -- select an option -- </option>"
+      for(var i=0; i<selected_players_excluding_vice_captain.length; i++){
+        cap_options += "<option value="+ selected_players_excluding_vice_captain[i][0] +">"+selected_players_excluding_vice_captain[i][1]+"</option>"
       }
       document.getElementById("select_captain").innerHTML = cap_options; 
       document.getElementById("select_captain").value = selected_captain; 
     
     }
-    
-
-    function selectedPlayers() {
-      selected_players = [];
-      team_wise = {};
-      for (var option of document.getElementById('selected_players').options)
-      {
-          if (option.selected) {
-            selected_players.push([option.value, option.text]);
-            var team_name = option.text.split(" - ")[1]
-            if(team_name in team_wise){
-              team_wise[team_name] = team_wise[team_name] + 1;
-            } else {
-              team_wise[team_name] = 1;
-            }
-          }
-      }
-      var team_details_span = "<p>";
-      var player_exceeded = false;
-      for (const [key, value] of Object.entries(team_wise)){
-        team_details_span += `${key} - ${value}<br/>`;
-        if(value>MAX_PLAYERS_PER_TEAM){
-          
-          error_html = `Selected ${value} players from ${key}. Select only ${MAX_PLAYERS_PER_TEAM}`;
-          document.getElementById("player_errors").style.display = "block";
-          document.getElementById("player_errors").innerHTML = error_html
-          player_exceeded = true;
-          MAX_PLAYERS_PER_TEAM_ERROR = true;
-        } 
-      }
-      if(!player_exceeded){
-        document.getElementById("player_errors").innerHTML = ""
-        document.getElementById("player_errors").style.display = "none";
-        MAX_PLAYERS_PER_TEAM_ERROR = false;
-      }
-      team_details_span += ` Total players selected - ${selected_players.length}<br/>${MAX_PLAYERS - selected_players.length} more to go </p>`;
-      document.getElementById("team_details_span").innerHTML = team_details_span;
-
-      var cap_options = "<option disabled selected value> -- select an option -- </option>"
-      for(var i=0; i<selected_players.length; i++){
-        cap_options += "<option value="+ selected_players[i][0] +">"+selected_players[i][1]+"</option>"
-      }
-      document.getElementById("select_captain").innerHTML = cap_options;
-      document.getElementById("select_vice_captain").innerHTML = cap_options;
-    }
 
     $(function () {
-      selectedPlayers()
-      
+      var allready_selected_players = {{ selected_players }}
+      for(let i = 0; i < allready_selected_players.length; i++){
+        document.getElementById("player-id-"+allready_selected_players[i]).click();
+      }
       document.getElementById("select_captain").value = {{selected_captain}}
       document.getElementById("select_vice_captain").value = {{selected_vice_captain}}
-      
-      
-      
+
       $.noConflict();
       $('select').each(function () {
         $(this).select2({
@@ -338,46 +425,48 @@
             allowClear: Boolean($(this).data('allow-clear')),
           });
         }); 
-        $('#selected_players').each(function () {
-          $(this).select2({
+        {% comment %} $('#selected_players').each(function () {
+          $(this).select2({            
             maximumSelectionLength: MAX_PLAYERS,
             theme: 'bootstrap4',
             width: 'style',
             placeholder: $(this).attr('placeholder'),
             allowClear: Boolean($(this).data('allow-clear')),
           });
-        }); 
+        });  {% endcomment %}
       });
 
       let createTeamForm = document.getElementById("create_team_form");
       createTeamForm.addEventListener("submit", (e) => {
         e.preventDefault();
-        
-        var all_players = document.getElementById('selected_players')
-        var players = [...all_players.options].filter(option => option.selected)
+          
+        var players = selected_players
 
         var all_matches = document.getElementById('selected_matches')
         var matches = [...all_matches.options].filter(option => option.selected)
 
         if(players.length != MAX_PLAYERS){
+          console.log("error")
           document.getElementById("player_errors").style.display = "block";
-          document.getElementById("player_errors").innerHTML =`You have selected ${players.length}. Please select ${MAX_PLAYERS}.`
+          document.getElementById("player_errors").innerHTML =`You have selected ${selected_players.length}. Please select ${MAX_PLAYERS}.`
+          document.getElementById("player_errors").scrollIntoView();  
         }
-        else if(!MAX_PLAYERS_PER_TEAM_ERROR){
-          document.getElementById("player_errors").style.display = "none";
-        } 
 
         if(matches.length != MAX_MATCHES){
           document.getElementById("match_errors").style.display = "block";
           document.getElementById("match_errors").innerHTML =`You have selected ${matches.length}. Please select ${MAX_MATCHES}.`
-        } else if(!MAX_PLAYERS_PER_TEAM_ERROR) {
-          document.getElementById("match_errors").style.display = "none";
-        }
+        } 
 
-        if(players.length == MAX_PLAYERS && matches.length == MAX_MATCHES && !MAX_PLAYERS_PER_TEAM_ERROR){
+        if(players.length == MAX_PLAYERS && matches.length == MAX_MATCHES){
+          var hidden_text = ""
+          for(i=0; i<selected_players.length; i++){
+            hidden_text += "<option value="+ selected_players[i][0] +" selected>"+selected_players[i][1]+"</option>"
+          }
+          document.getElementById("selected_players_hidden_list").innerHTML = hidden_text
           createTeamForm.submit();
         }
       });
+
     </script>
 
 {% endblock %}

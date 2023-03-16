@@ -798,13 +798,13 @@ h6 {
 # Dashboard
 --------------------------------------------------------------*/
 /* Filter dropdown */
-.dashboard .filter {
+ .filter {
   position: absolute;
   right: 0px;
   top: 15px;
 }
 
-.dashboard .filter .icon {
+ .filter .icon {
   color: #aab7cf;
   padding-right: 20px;
   padding-bottom: 5px;
@@ -812,16 +812,15 @@ h6 {
   font-size: 16px;
 }
 
-.dashboard .filter .icon:hover,
-.dashboard .filter .icon:focus {
+ .filter .icon:hover,
+ .filter .icon:focus {
   color: #4154f1;
 }
 
-.dashboard .filter .dropdown-header {
+ .filter .dropdown-header {
   padding: 8px 15px;
 }
-
-.dashboard .filter .dropdown-header h6 {
+ .filter .dropdown-header h6 {
   text-transform: uppercase;
   font-size: 14px;
   font-weight: 600;
@@ -831,7 +830,7 @@ h6 {
   padding: 0;
 }
 
-.dashboard .filter .dropdown-item {
+ .filter .dropdown-item {
   padding: 8px 15px;
 }
 
@@ -1330,6 +1329,157 @@ h6 {
   color: red;
   font-family: "Poppins", sans-serif;
 }
+
+.choose-players-ul {
+  width:  100%;
+  padding-bottom: 10px;
+}
+.choose-players-li {
+  width: 20%;
+  height: 25px;
+  margin-bottom: 10px;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 400;
+  color: #012970;
+  font-family: "Poppins", sans-serif;
+}
+
+@media (max-width: 768px){
+  .choose-players-li {
+    width: 20%;
+    height: 35px;
+    padding-bottom: 0px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 400;
+    color: #012970;
+    font-family: "Poppins", sans-serif;
+  }
+}
+
+.players-li{
+  font-size: 16px;
+  font-weight: 400;
+  color: #012970;
+  font-family: "Poppins", sans-serif;
+}
+
+.player_number_indicator{
+  font-size: 12px;
+  font-weight: 400;
+  color: #6980aa;
+  font-family: "Poppins", sans-serif;
+}
+
+.number {
+  list-style-type: none;
+}
+
+.full  {
+  border: solid 3px #ccc;
+  color: white;
+  border: 5px;
+  border-radius: 4px;
+  width:30px;
+  float: left;
+  margin: 2px;
+  padding: 8px 5px;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+  background-color: rgb(58, 192, 58);
+}
+
+.empty {
+  border: solid 3px #ccc;
+  color: black;
+  border: 5px;
+  border-radius: 4px;
+  width:30px;
+  float: left;
+  margin: 2px;
+  padding: 8px 5px;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+  background-color: #e0f8e9;
+}
+
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+.c-button-reset {
+  display: inline-block;
+  font-family: inherit;
+  font-size: 1em;
+  outline: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.c-plus-to-check {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  background-color: transparent;
+}
+.c-plus-to-check:before, .c-plus-to-check:after {
+  background-color: #ff771d;
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 50%;
+  left: 0.375em;
+  right: 0.375em;
+  height: 0.25em;
+  transition: transform 300ms cubic-bezier(0.75, -0.6, 0.14, 1.59) 150ms;
+  will-change: transform background-color;
+}
+.c-plus-to-check:before {
+  transform: translate(0, 0) rotate(-90deg) scale(1, 1);
+}
+.c-plus-to-check:after {
+  transform: translate(0, 0) rotate(180deg) scale(1, 1);
+}
+.c-plus-to-check__text {
+  position: absolute;
+  top: -3125rem;
+  left: -3125rem;
+  font-size: 0;
+  height: 0;
+  width: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+.c-plus-to-check[data-state='active']:before, .c-plus-to-check[data-state='active']:after {
+  background-color: #89b937;
+  transition-duration: 150ms;
+  transition-timing-function: ease-out;
+  transition-delay: 0s;
+}
+.c-plus-to-check[data-state='active']:before {
+  transform: translate(calc(25% - .175em), -0.175em) rotate(-45deg) scale(1, 1);
+}
+.c-plus-to-check[data-state='active']:after {
+  transform: translate(-25%, 0.175em) rotate(45deg) scale(0.43, 1);
+}
+
+.team-list-ul{
+  max-height: 300px;
+  margin-bottom: 10px;
+  overflow-y:scroll;
+  -webkit-overflow-scrolling: touch;
+}
+
 
 /* end create team style */
 

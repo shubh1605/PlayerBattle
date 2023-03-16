@@ -787,24 +787,34 @@ def create_team(request):
 		curr_user = request.user
 		prof = Profile.objects.get(user=curr_user)
 		# all_teams = Player.objects.values('team_name').annotate(='player_name')
-		all_teams = [x['team_name'] for x in Player.objects.values('team_name').annotate(dcount=Count('team_name'))]
-		all_players = {}
+		all_teams = [str(x['team_name']) for x in Player.objects.values('team_name').annotate(dcount=Count('team_name'))]
+		all_players = []
+		all_team_names = []
 		for team in all_teams:
-			all_players[team] = Player.objects.filter(team_name=team)
-		# print(all_players)
+			temp = {}
+			temp["team_id"] = "-".join(team.split(" "))
+			temp["name"] = team
+			abbr = ""
+			for i in team.split(" "):
+				abbr += i[0]
+			temp["abbr"] = abbr
+			temp["players"] = Player.objects.filter(team_name=team)
+			all_players.append(temp)
+			all_team_names.append(temp["name"])
+		
 		matches = Match.objects.all()
 		context = {}
 		if request.method == "GET":
+			# print(all_players)
 			curr_user = request.user
 			prof = Profile.objects.get(user=curr_user)
-			# print(prof.players.all())
 			selected_players = [int(player.id) for player in prof.players.all()]
 			selected_matches = [int(match.id) for match in prof.matches.all()]
 			selected_orange_cap = int(prof.orange_cap.id) if prof.orange_cap else ""
 			selected_purple_cap = int(prof.purple_cap.id) if prof.purple_cap else ""
 			selected_captain = int(prof.captain.id) if prof.captain else ""
 			selected_vice_captain = int(prof.vice_captain.id) if prof.vice_captain else ""
-
+			# print(selected_players)
 			context = {
 				'user':curr_user,
 				'all_matches':matches,
@@ -815,6 +825,7 @@ def create_team(request):
 				'selected_matches': selected_matches,
 				'selected_orange_cap': selected_orange_cap,
 				'selected_purple_cap': selected_purple_cap,
+				'all_team_names':all_team_names,
 			}
 			return render(request, 'core/create_team.html', context)
 		if request.method == "POST":
@@ -837,7 +848,6 @@ def create_team(request):
 					player = Player.objects.get(id=pid)
 					prof.players.add(player)
 					user_points[player.name] = [0.0,0.0,0.0]
-
 				prof.matches.clear()
 				for mid in matches:
 					match = Match.objects.get(id=mid)
@@ -854,8 +864,9 @@ def create_team(request):
 				'user':curr_user,
 				'all_matches':matches,
 				'team_wise_players':all_players,
+				'all_team_names':all_team_names,
 			}
-			return render(request, 'core/create_team.html', context)
+			return redirect('create-team')
 	else:
 		message = f'Oops, An error occured'
 		messages.error(request, message )

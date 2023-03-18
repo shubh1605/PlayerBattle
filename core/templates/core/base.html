@@ -5,6 +5,7 @@
 {% url 'admin-func' as admin_url %}
 {% url 'player-stats' as player_url %}
 {% url 'compare-teams' as compare_teams %}
+{% url 'policy' as policy %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -211,6 +212,13 @@
 
 
       {% endif %}
+
+      <li class="nav-item">
+        <a class="nav-link {% if request.path != player_url %}collapsed{% endif %}" href="{% url 'policy' %}">
+          <i class="bi bi-card-text"></i>
+          <span>Policy</span>
+        </a>
+      </li><!-- End Profile Page Nav -->
 
     </ul>
 

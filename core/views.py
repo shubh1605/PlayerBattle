@@ -420,7 +420,7 @@ def logout_view(request):
 
 def login_user(request):
 	if request.method == "POST":
-		username = request.POST['username']
+		username = request.POST['username'].lower()
 		password = request.POST['password']
 
 		user = authenticate(username=username,password=password)
@@ -428,7 +428,7 @@ def login_user(request):
 		if user is not None:
 			if user.is_active:
 				login(request, user)
-				message = f'Hello {user.username}! You have been logged in'
+				message = f'Hello {user.username.capitalize()}! You have been logged in'
 				messages.success(request, message )
 				return redirect('home-page')
 			else:
@@ -450,20 +450,19 @@ def register(request):
 		last_name = request.POST['last_name']
 		# email = request.POST['email']
 		reference = request.POST['reference']
-		username = request.POST['username']
+		username = request.POST['username'].lower()
 		password1 = request.POST['password1']
 		password2 = request.POST['password2']
 		number = request.POST['number']
 		# existing_user = User.objects.filter(email=email)
 		all_users = User.objects.values()
-		all_usernames = [user['username'] for user in all_users]
+		all_usernames = [user['username'].lower() for user in all_users]
 
 		if password1 == password2:
-			if (reference in all_usernames) or reference=="" :
+			if (reference.lower() in all_usernames) or reference=="" :
 				try:
 					new_user = User.objects.create_user(first_name=first_name,last_name=last_name,username=username,password=password1)
 					new_user.save()
-					print(new_user.is_active)
 					prof = Profile.objects.get(user=new_user)
 					prof.contact_no = number
 					prof.reference = reference
@@ -1004,7 +1003,8 @@ def get_live_score(request, id):
 	return render(request, 'core/live_score.html', context)
 
 
-
+def policy(request):
+	return render(request, 'core/policy.html')
 
 
 

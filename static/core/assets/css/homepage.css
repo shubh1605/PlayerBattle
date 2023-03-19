@@ -97,3 +97,13 @@ border: 1px solid blacks;
 margin-top: 0px;
 margin-bottom: 8px;
 }
+
+.dashboard-register{
+width: 100%;
+margin-bottom: 10px;
+}
+.dashboard-register a {
+width: 100%;
+background-color: #012970;
+}
+

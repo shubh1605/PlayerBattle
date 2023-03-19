@@ -40,12 +40,6 @@
 
     <div class="pagetitle">
       <h1>Dashboard</h1>
-      <nav>
-        <ol class="breadcrumb">
-          {% comment %} <li class="breadcrumb-item"><a href="{% url 'home-page' %}">Home</a></li> {% endcomment %}
-          <li class="breadcrumb-item active">Dashboard</li>
-        </ol>
-      </nav>
     </div>
     <!-- End Page Title -->
 
@@ -55,11 +49,15 @@
         <!-- Left side columns -->
         <div class="col-lg-8">  
 
+          <div class="dashboard-register">
+            <a class="btn btn-primary" href={% url 'register' %}>Register Now</a>
+          </div>
+
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">How to win rewards?</h5>
               <ol class="instructions">
-                <li>Register yourself on the portal and create your fantasy team.</li>
+                <li>Register yourself on the portal using this <a href="{% url 'register' %}" > link</a> and create your fantasy team.</li>
                 <li>Predict daily match outcomes to earn cashback incentives.</li>
                 <li>Participate in entertaining weekly events to receive surprises.</li>
               </ol>

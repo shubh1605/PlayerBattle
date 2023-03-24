@@ -75,14 +75,49 @@
             </div>
         </div>
       </div>
+       <!-- Modal Dialog Scrollable -->
+       <div class="modal fade" id="modalDialogScrollable" tabindex="-1">
+        <div class="modal-dialog modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Selected players</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th class="table-header" scope="col">Player</th>
+                    <th class="table-header" scope="col">Team</th>
+                  </tr>
+                </thead>
+                <tbody id="view-players-modal">
+                        
+                </tbody>
+            </table>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Okay</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- End Modal Dialog Scrollable-->
       <form class="row g-3 needs-validation" method="POST" action="{% url 'create-team' %}"  id="create_team_form" >
       {% csrf_token %}
-      <div class="col-lg-6">
-        
+      <div class="col-lg-6">   
         <div class="card">
           <div class="card-body ">
-            <h5 class="card-title">Choose players</h5>
-
+            <div class="row">
+              <div class="col-10">
+                <h5 class="card-title justify-content-start">Choose players</h5>
+              </div>
+              <div class="col-2">
+                <button type="button" class="view-list-btn" id="view-players-list" data-bs-toggle="modal" data-bs-target="#modalDialogScrollable">
+                  <i class="bi bi-card-list view-list-i"></i>
+                </button>
+              </div>             
+            </div>
             <div class="row">
               <!-- <div class="circle">1</div> -->
               <ul class="number" id="number-div">
@@ -254,6 +289,7 @@
     const MAX_PLAYERS_PER_TEAM = 2;
     var selected_players = [];
     var team_wise_player_count = {};
+    var selected_players_team = {};
     
     {{ all_team_names|safe }}.forEach(item => {
       // console.log(item)
@@ -298,6 +334,7 @@
         selected_players.push(p)
         team_wise_player_count[team_name] += 1
         event.srcElement.setAttribute('data-state','active'); 
+        selected_players_team[p[0]] = team_name
       }
       
       document.getElementById(team_abbr+"-tab").innerHTML = team_abbr.toUpperCase() + " <span class='player_number_indicator'>("+team_wise_player_count[team_name]+")<span>"
@@ -434,6 +471,21 @@
             allowClear: Boolean($(this).data('allow-clear')),
           });
         });  {% endcomment %}
+      });
+
+      let viewPlayersBtn = document.getElementById("view-players-list");
+      viewPlayersBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        var viewPlayersModal = document.getElementById("view-players-modal")
+        var viewPlayersModalHtml = ""
+        for(var i=0; i<selected_players.length; i++){
+          viewPlayersModalHtml += `<tr>
+                                      <td class="table-content">${selected_players[i][1]}</td>
+                                      <td class="table-content">${selected_players_team[selected_players[i][0]]}</td>
+
+                                  </tr>`
+        }
+        viewPlayersModal.innerHTML = viewPlayersModalHtml;
       });
 
       let createTeamForm = document.getElementById("create_team_form");

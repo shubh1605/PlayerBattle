@@ -1345,6 +1345,19 @@ h6 {
   font-family: "Poppins", sans-serif;
 }
 
+.view-list-btn{
+  padding: 6px;
+  background-color: transparent;
+  border: none;
+}
+
+.view-list-i{
+  /* width: 50px; */
+  font-size: 24px;
+  /* height: 50px; */
+  
+}
+
 @media (max-width: 768px){
   .choose-players-li {
     width: 20%;

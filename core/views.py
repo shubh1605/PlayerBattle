@@ -853,6 +853,7 @@ def create_team(request):
 					prof.matches.add(match)
 
 				prof.points = json.dumps(user_points)
+				prof.has_created_team = True
 				prof.save()
 				message = f'Your team has been successfully created!'
 				messages.success(request, message)
@@ -1005,6 +1006,14 @@ def get_live_score(request, id):
 
 def policy(request):
 	return render(request, 'core/policy.html')
+
+# def get_users_not_created_team(request):
+# 	all_profiles = Profile.objects.all()
+# 	profs = []
+# 	for prof in all_profiles:
+# 		if prof.captain == None:
+# 			profs.append(prof.user)
+# 	return redirect('admin-func')
 
 
 

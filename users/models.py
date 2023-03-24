@@ -25,10 +25,10 @@ class Profile(models.Model):
     purple_cap = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='purple_cap', default=None,null = True, blank = True)
     reference = models.TextField(null=True, blank=True)
     prediction_streak = models.IntegerField(default=0, null=True, blank=True)
-
+    has_created_team = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.user.username
+        return self.user.username 
 
     # points_description = {
     #   "Match": {

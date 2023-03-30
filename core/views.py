@@ -27,17 +27,6 @@ def start_match(request):
 			variable = Variable.objects.all()[0]
 			matches_completed = variable.number_of_match_completed
 			is_match_live = variable.is_any_match_live
-
-			# print()
-			# if request.method == 'GET':
-
-			# 	print(is_match_live)
-			# 	all_matches = Match.objects.all()
-			# 	context = {
-			# 		"is_any_match_live": is_match_live,
-			# 	}
-			# 	return render(request, 'core/admin.html', context)
-			# else:
 			match_link = request.POST['match']
 			live_match = Match.objects.get(link=match_link)
 			variable.daily_prediction.remove(live_match)
@@ -144,12 +133,12 @@ def update_streak(user, curr_streak, has_predicted_correct):
 
 
 def allot_points_to_user(match_points, match, result):
-	user_profiles =  Profile.objects.filter(user__in= User.objects.filter(is_active=True, is_superuser = False))
+	user_profiles =  Profile.objects.filter(user__in= User.objects.filter(is_active=True, is_superuser = False), has_created_team = True)
 	for user_profile in user_profiles:
 		try:
 			description = json.loads(user_profile.points_description)
 
-			# checking if this match points have been added to the user or not
+			# checking if this match points have been added to the user or not 
 			if str(match.id) in description.keys():
 				continue
 			else:
@@ -288,20 +277,32 @@ def home_page(request):
 
 	if not request.user.is_anonymous:
 		logged_in_user = Profile.objects.get(user=request.user)
+
+		connected_accounts = logged_in_user.connected_accounts
+		if connected_accounts == "":
+			connected_accounts =str(request.user.id)
+		connected_accounts_list = [int(x) for x in connected_accounts.split(",")]
+		connected_accounts_profs = [Profile.objects.get(user = User.objects.get(id=id)) for id in connected_accounts_list]
 		daily_prediction_match = Variable.objects.all()[0].daily_prediction.all()
-		user_predictions = json.loads(logged_in_user.daily_prediction)
 		new_predictions = {}
-		for match in daily_prediction_match:
-			match_id = match.id
-			new_predictions[match] = {}
-			# match = Match.objects.get(id=match_id)
-			if str(match_id) not in user_predictions.keys():
-				new_predictions[match]['prediction'] = None
-				new_predictions[match]['result'] = match.name.split(" vs ")
-				new_predictions[match]['result'].append("tie")
-			else:
-				new_predictions[match]['prediction'] = user_predictions[str(match_id)]
-	
+		for account_prof in connected_accounts_profs:		
+			user_predictions = json.loads(account_prof.daily_prediction)
+			new_predictions[account_prof] = {}
+			
+			# print(new_predictions)
+			for match in daily_prediction_match:
+
+				match_id = match.id
+				new_predictions[account_prof][match] = {}
+				new_predictions[account_prof][match]['streak'] = account_prof.prediction_streak
+				# match = Match.objects.get(id=match_id)
+				if str(match_id) not in user_predictions.keys():
+					new_predictions[account_prof][match]['prediction'] = None
+					new_predictions[account_prof][match]['result'] = match.name.split(" vs ")
+					new_predictions[account_prof][match]['result'].append("tie")
+				else:
+					new_predictions[account_prof][match]['prediction'] = user_predictions[str(match_id)]
+		
 	context = {
 		'users':users,
 		'players':players,
@@ -320,7 +321,9 @@ def predict_results(request, id):
 		if not request.user.is_anonymous:
 			if request.POST:
 				predicted_result = request.POST['match_predict_'+str(id)]
-				user_profile = Profile.objects.get(user=request.user)
+				account_predicted = request.POST['account_predicted-'+str(id)]
+				user_predicted = User.objects.get(username = account_predicted)
+				user_profile = Profile.objects.get(user=user_predicted)
 				user_predictions = json.loads(user_profile.daily_prediction)
 				match = Match.objects.get(id=id)
 				if match not in user_predictions:

@@ -3,7 +3,7 @@
 {% load static %}
 {% block style %}
 {% load mathfilters %}
-  <link href="{% static 'core/assets/css/homepage.css' %}" rel="stylesheet">
+	<link href="{% static 'core/assets/css/homepage.css' %}" rel="stylesheet">
 {% endblock %}
 
 
@@ -11,364 +11,375 @@
 
 <main id="main" class="main">
 
-  {% if is_match_live %}
-    <hr class="marquee-hr"/>
-      <marquee>A match is live, your points will be added once the match ends.</marquee>
-    <hr class="marquee-hr"/>
-  {% endif %}
+	{% if is_match_live %}
+		<hr class="marquee-hr"/>
+			<marquee>A match is live, your points will be added once the match ends.</marquee>
+		<hr class="marquee-hr"/>
+	{% endif %}
 
-  
-    
-    <div class="message-div">
-      {% for message in messages %}
-        <div class="container-fluid mt-1 mx-1">
-          <div
-            class="alert {{ message.tags }} alert-dismissible fade show"
-            role="alert"
-          >
-            {{ message }}
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="alert"
-              aria-label="Close"
-            ></button>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
+	
+		
+		<div class="message-div">
+			{% for message in messages %}
+				<div class="container-fluid mt-1 mx-1">
+					<div
+						class="alert {{ message.tags }} alert-dismissible fade show"
+						role="alert"
+					>
+						{{ message }}
+						<button
+							type="button"
+							class="btn-close"
+							data-bs-dismiss="alert"
+							aria-label="Close"
+						></button>
+					</div>
+				</div>
+			{% endfor %}
+		</div>
 
-    <div class="pagetitle">
-      <h1>Dashboard</h1>
-    </div>
-    <!-- End Page Title -->
+		<div class="pagetitle">
+			<h1>Dashboard</h1>
+		</div>
+		<!-- End Page Title -->
 
-    <section class="section dashboard">
-      <div class="row">
+		<section class="section dashboard">
+			<div class="row">
 
-        <!-- Left side columns -->
-        <div class="col-lg-8">  
+				<!-- Left side columns -->
+				<div class="col-lg-8">  
 
-          <div class="dashboard-register">
-            <a class="btn btn-primary" href={% url 'register' %}>Register Now</a>
-          </div>
+					<div class="dashboard-register">
+						<a class="btn btn-primary" href={% url 'register' %}>Register Now</a>
+					</div>
 
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">How to win rewards?</h5>
-              <ol class="instructions">
-                <li>Register yourself on the portal using this <a href="{% url 'register' %}" > link</a> and create your fantasy team.</li>
-                <li>Predict daily match outcomes to earn cashback incentives.</li>
-                <li>Participate in entertaining weekly events to receive surprises.</li>
-              </ol>
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title">How to win rewards?</h5>
+							<ol class="instructions">
+								<li>Register yourself on the portal using this <a href="{% url 'register' %}" > link</a> and create your fantasy team.</li>
+								<li>Predict daily match outcomes to earn cashback incentives.</li>
+								<li>Participate in entertaining weekly events to receive surprises.</li>
+							</ol>
 
-              <h5 class="card-title">Points system</h5>
-              <ol class="instructions">
-                <li>A player receives 1 point for every run that is scored.</li>
-                <li>A player receives 25 points for every wicket that is taken.</li>
-                <li>Each point earned by your team's captain will be multiplied by 2.</li>
-                <li>Each point earned by your team's vice-captain will be multiplied by 1.5.</li>
-                <li>Each point earned by your player in a bonus match will be multiplied by 2.</li>
-                <li>Correctly predict a team to win the game to earn 20 points, while predict a tie to earn 75 points.</li>
-              </ol>
+							<h5 class="card-title">Points system</h5>
+							<ol class="instructions">
+								<li>A player receives 1 point for every run that is scored.</li>
+								<li>A player receives 25 points for every wicket that is taken.</li>
+								<li>Each point earned by your team's captain will be multiplied by 2.</li>
+								<li>Each point earned by your team's vice-captain will be multiplied by 1.5.</li>
+								<li>Each point earned by your player in a bonus match will be multiplied by 2.</li>
+								<li>Correctly predict a team to win the game to earn 20 points, while predict a tie to earn 75 points.</li>
+							</ol>
 
-              <h5 class="card-title">Daily prediction</h5>
-              <ol class="instructions">
-                <li>Maintain a streak of 5 correct prediction and receive straight cashback.</li>
-                <li>If you incorrectly predict a game, you will restart at 0.</li>
-                <li>If you miss a game, you will restart at 0.</li>
-                <li>If a match is abandoned, streaks of users who made predictions will be kept; everyone else will have to start over at 0.</li>
-              </ol>
-            </div>
-          </div>
+							<h5 class="card-title">Daily prediction</h5>
+							<ol class="instructions">
+								<li>Maintain a streak of 5 correct prediction and receive straight cashback.</li>
+								<li>If you incorrectly predict a game, you will restart at 0.</li>
+								<li>If you miss a game, you will restart at 0.</li>
+								<li>If a match is abandoned, streaks of users who made predictions will be kept; everyone else will have to start over at 0.</li>
+							</ol>
+						</div>
+					</div>
 
-          <!-- Recent Activity -->
-          <div class="card">
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6 style="cursor:pointer" onclick="viewAllNotifications()">View all</h6>
-                </li>
-                <li class="dropdown-header text-start">
-                  <h6 style="cursor:pointer" onclick="viewLessNotifications()">View less</h6>
-                </li>
-              </ul>
-            </div>
-            <div class="card-body .d-sm-none .d-xs-none">
-              <h5 class="card-title">Recent Notifications </h5>
-              <div class="activity notification-class">
-                {% if notifications|length == 0 %}
-                  <h5>No notifications yet!</h5>
-                {% endif %}
-                {% for notification in notifications|slice:"3" %}
-                  <div class="activity-item d-flex">
-                    <div class="activite-label">{{ notification.subject }}</div>
-                    <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
-                    <div class="activity-content">
-                      {{ notification.description }}
-                    </div>
-                  </div><!-- End activity item-->    
-                {% endfor %}        
-              </div>
-            </div>
-          </div><!-- End Recent Activity -->           
-
-
-            {% if is_match_live %}
-              <div class="row">
-                <div class="card">
-                  <div class="card-body">
-                    <div class="row">
-                        <div class="col-11">
-                            <h5 class="card-title">Live Score <span>| {{ live_match_name|title }} </span></h5>
-                            
-                        </div>
-                        <div class="col-1">
-                            <div id="refresh"><i class="bi bi-arrow-clockwise refresh-icon"></i></div>
-                        </div>
-                    </div>
-                    <div >
-                      <img id="loading" src="{% static 'core/assets/img/loading.gif' %}" />
-                    </div>
-                    <div id="live-score-div">
-                    </div>
-                  </div>
-                </div>
-              </div>              
-            {% endif %}
+					<!-- Recent Activity -->
+					<div class="card">
+						<div class="filter">
+							<a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+							<ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+								<li class="dropdown-header text-start">
+									<h6 style="cursor:pointer" onclick="viewAllNotifications()">View all</h6>
+								</li>
+								<li class="dropdown-header text-start">
+									<h6 style="cursor:pointer" onclick="viewLessNotifications()">View less</h6>
+								</li>
+							</ul>
+						</div>
+						<div class="card-body .d-sm-none .d-xs-none">
+							<h5 class="card-title">Recent Notifications </h5>
+							<div class="activity notification-class">
+								{% if notifications|length == 0 %}
+									<h5>No notifications yet!</h5>
+								{% endif %}
+								{% for notification in notifications|slice:"3" %}
+									<div class="activity-item d-flex">
+										<div class="activite-label">{{ notification.subject }}</div>
+										<i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
+										<div class="activity-content">
+											{{ notification.description }}
+										</div>
+									</div><!-- End activity item-->    
+								{% endfor %}        
+							</div>
+						</div>
+					</div><!-- End Recent Activity -->           
 
 
-            <!-- Daily Predictions -->
-            {% if request.user %}
-              {% for match, value in new_predictions.items %}
-                <div class="col-12">
-                  <div class="card recent-sales overflow-auto">
-                    <div class="card-body">
-                      <h5 class="card-title">{{ match.name|title }} <span>| Daily Prediction</span></h5>
-                        {% if value.prediction %}
-                        <form class="row g-3" action="{% url 'predict-results' match.id %}" method="POST"> 
-                          {% csrf_token %}                 
-                          <div class="col-md-12">
-                              <div class="form-floating mb-3">
-                                  <select class="form-select" id="floatingSelect" aria-label="State" name="match_predict_{{ match.id }}" required>                                   
-                                      <option value="{{value.prediction}}">{{ value.prediction|title }}</option>                                    
-                                  </select>
-                                  <label for="floatingSelect"> Predicted </label>
-                              </div>
-                          </div>  
-                          <div class="text-center">
-                            <button type="submit" disabled class="btn btn-primary">Predict</button>
-                          </div>   
-                        </form>
-                        {% else %}
-                          <form class="row g-3" action="{% url 'predict-results' match.id %}" method="POST"> 
-                            {% csrf_token %}                 
-                            <div class="col-md-12">
-                                <div class="form-floating mb-3">
-                                    <select class="form-select" id="floatingSelect" aria-label="State" name="match_predict_{{ match.id }}" required>
-                                      <option disabled selected value> -- select an option -- </option>    
-                                      {% for result in value.result %}  
-                                        <option value="{{result}}">{{ result|title }}</option>  
-                                      {% endfor %}
-                                    </select>
-                                    <label for="floatingSelect"> Predict result</label>
-                                </div>
-                            </div>  
-                            <div class="text-center">
-                              <button type="submit" class="btn btn-primary">Predict</button>
-                            </div>   
-                          </form>
-                        {% endif %}
-                      
-                    </div>
-                  </div>
-                </div>
-              {% endfor %}
-            {% endif %}
+						{% if is_match_live %}
+							<div class="row">
+								<div class="card">
+									<div class="card-body">
+										<div class="row">
+												<div class="col-11">
+														<h5 class="card-title">Live Score <span>| {{ live_match_name|title }} </span></h5>
+														
+												</div>
+												<div class="col-1">
+														<div id="refresh"><i class="bi bi-arrow-clockwise refresh-icon"></i></div>
+												</div>
+										</div>
+										<div >
+											<img id="loading" src="{% static 'core/assets/img/loading.gif' %}" />
+										</div>
+										<div id="live-score-div">
+										</div>
+									</div>
+								</div>
+							</div>              
+						{% endif %}
 
-            <!-- Overall Player Points -->
-            <div class="col-12">
-              <div class="card recent-sales overflow-auto">
-                <div class="card-body" >
-                  <h5 class="card-title">User Points <span>| Overall</span></h5>
-                  <table class="table table-hover datatable" id="user_points">
-                    <thead>
-                      <tr>
-                        {% comment %} <th scope="col">#</th> {% endcomment %}
-                        <th scope="col">Rank</th>
-                        <th scope="col">User</th>
-                        <th scope="col">Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for user in users %}
-                      <tr>
-                        <td class="table-content"><span class="badge bg-success">{{ user.rank }}</span></td>
-                        <td class="table-content"><a href="{% url 'profile' user.user.id %}" class="text-primary">{{ user.user.username|title }}</a></td>
-                        <td class="table-content"><span class="badge bg-success">{{ user.total_score }}</span></td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div><!-- End Overall User Points -->
 
-            <div class="col-12">
-              <div class="card recent-sales overflow-auto">
+						<!-- Daily Predictions -->
+						{% if request.user %}
+							{% for prof, predictions in new_predictions.items %}
+								<div class="col-12">
+									<div class="card recent-sales overflow-auto">
+										<div class="card-body">
+											{% for match, value in predictions.items %}
+												<h5 class="card-title">{{ match.name|title }} <span>| {{prof.user.username}} | Streak - {{ value.streak }}</span></h5>
+												{% if value.prediction %}
+													<form class="row g-3" action="{% url 'predict-results' match.id %}" method="POST"> 
+														{% csrf_token %} 
+														<div class="row mt-3">
+															<div class="col-9">
+																<input style="display:none;" id="{{prof.user.username}}-predict-{{match.id}}" name="account_predicted" value={{prof.user.username}}></input>
+																<div class="form-floating mb-3">
+																		<select class="form-select" id="floatingSelect" aria-label="State" name="match_predict_{{ match.id }}" required>                                   
+																				<option value="{{value.prediction}}">{{ value.prediction|title }}</option>                                    
+																		</select>
+																		<label for="floatingSelect"> Predicted </label>
+																</div>
+															</div>
+															<div class="col-3">
+																<div class="text-center mt-1">
+																	<button type="submit" disabled class="btn btn-primary">Predict</button>
+																</div>
+															</div>  
+														</div>                             
+													</form>
+												{% else %}
+													<form class="row g-3" action="{% url 'predict-results' match.id %}" method="POST"> 
+														{% csrf_token %}   
+														<div class="row mt-3">
+															<div class="col-9">
+																<input style="display:none;" id="{{prof.user.username}}-predict-{{match.id}}" name="account_predicted-{{match.id}}" value={{prof.user.username}}></input>
+																	<div class="form-floating mb-3">
+																			<select class="form-select" id="floatingSelect" aria-label="State" name="match_predict_{{ match.id }}" required>
+																				<option disabled selected value> -- select an option -- </option>    
+																				{% for result in value.result %}  
+																					<option value="{{result}}">{{ result|title }}</option>  
+																				{% endfor %}
+																			</select>
+																			<label for="floatingSelect"> Predict result</label>
+																	</div>
+															</div>  
+															<div class="col-3 mt-1">
+																<div class="text-center">
+																	<button type="submit" class="btn btn-primary">Predict</button>
+																</div>
+															</div>
+														</div>                 
+													</form>
+												{% endif %}										
+											{% endfor %}
+										</div>
+									</div>
+								</div>
+							{% endfor %}
+						{% endif %}
 
-                <div class="card-body" >
-                  <h5 class="card-title">Player Points <span>| Overall</span></h5>
+						<!-- Overall Player Points -->
+						<div class="col-12">
+							<div class="card recent-sales overflow-auto">
+								<div class="card-body" >
+									<h5 class="card-title">User Points <span>| Overall</span></h5>
+									<table class="table table-hover datatable" id="user_points">
+										<thead>
+											<tr>
+												{% comment %} <th scope="col">#</th> {% endcomment %}
+												<th scope="col">Rank</th>
+												<th scope="col">User</th>
+												<th scope="col">Total</th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for user in users %}
+											<tr>
+												<td class="table-content"><span class="badge bg-success">{{ user.rank }}</span></td>
+												<td class="table-content"><a href="{% url 'profile' user.user.id %}" class="text-primary">{{ user.user.username|title }}</a></td>
+												<td class="table-content"><span class="badge bg-success">{{ user.total_score }}</span></td>
+											</tr>
+											{% endfor %}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div><!-- End Overall User Points -->
 
-                  <table class="table table-hover datatable" id="player_points">
-                    <thead>
-                      <tr>
-                        <th scope="col">Player</th>
-                        <th scope="col">Bat</th>
-                        <th scope="col">Bowl</th>
-                        <th scope="col">Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for player in players %}
-                      <tr>
-                        {% comment %} <th scope="row"><a href="#">#</a></th> {% endcomment %}
-                        <td class="table-content"><a href="{% url 'player-stats' %}?player_id={{ player.id }}" class="text-primary">{{ player.name|title }}</a></td>
-                        <td class="table-content">{{ player.bat_points }}</td>
-                        <td class="table-content">{{ player.bowl_points }}</td>
-                        <td class="table-content"><span class="badge bg-success">{{ player.total_points }}</span></td>
-                      </tr>
-                      {% endfor %}
-        
-                    </tbody>
-                  </table>
+						<div class="col-12">
+							<div class="card recent-sales overflow-auto">
 
-                </div>
+								<div class="card-body" >
+									<h5 class="card-title">Player Points <span>| Overall</span></h5>
 
-              </div>
-            </div><!-- End Overall Player Points -->
-        </div><!-- End Left side columns -->
+									<table class="table table-hover datatable" id="player_points">
+										<thead>
+											<tr>
+												<th scope="col">Player</th>
+												<th scope="col">Bat</th>
+												<th scope="col">Bowl</th>
+												<th scope="col">Total</th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for player in players %}
+											<tr>
+												{% comment %} <th scope="row"><a href="#">#</a></th> {% endcomment %}
+												<td class="table-content"><a href="{% url 'player-stats' %}?player_id={{ player.id }}" class="text-primary">{{ player.name|title }}</a></td>
+												<td class="table-content">{{ player.bat_points }}</td>
+												<td class="table-content">{{ player.bowl_points }}</td>
+												<td class="table-content"><span class="badge bg-success">{{ player.total_points }}</span></td>
+											</tr>
+											{% endfor %}
+				
+										</tbody>
+									</table>
 
-        <!-- Right side columns -->
-        <div class="col-lg-4">
-          <!-- Sales Card -->
-            <div class="card info-card sales-card">
-              <div class="card-body">
-                <h5 class="card-title">MVP<span> | Most Points </span></h5>
-                <div class="d-flex align-items-center">
-                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                    <img class="img-icon" src={% static 'core/assets/img/bat-ball.png' %}></img>
-                  </div>
-                  <div class="ps-3">
-                    <h5> {{ players.0.name|title }} - {{ players.0.total_points }} </h5>
-                  </div>
-                </div>
-              </div>
-            </div>
+								</div>
 
-            <div class="card info-card revenue-card">
-              <div class="card-body">
-                <h5 class="card-title">Batting <span>| Most Runs </span></h5>
-                <div class="d-flex align-items-center">
-                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                   <img class="img-icon" src={% static 'core/assets/img/bat.png' %}></img>
-                  </div>
-                  <div class="ps-3">
-                    <h5>{{ best_batsman.name|title }} - {{ best_batsman.bat_points }}  </h5>
-                  </div>
-                </div>
-              </div>
-            </div>
+							</div>
+						</div><!-- End Overall Player Points -->
+				</div><!-- End Left side columns -->
 
-            <div class="card info-card customers-card">
-              <div class="card-body">
-                <h5 class="card-title">Bowling <span>| Most Wickets</span></h5>
-                <div class="d-flex align-items-center">
-                  <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                    {% comment %} <i class="bi bi-people"></i> {% endcomment %}
-                    <img class="img-icon" src={% static 'core/assets/img/ball.png' %}></img>
-                  </div>
-                  <div class="ps-3">
-                    <h5> {{ best_bowler.name|title }} - {{ best_bowler.bowl_points|div:25  }}</h5>
-                  </div>
-                </div>
-              </div>
-            </div>
-        </div><!-- End Right side columns -->
-      </div>
-    </section>
-  </main><!-- End #main -->
+				<!-- Right side columns -->
+				<div class="col-lg-4">
+					<!-- Sales Card -->
+						<div class="card info-card sales-card">
+							<div class="card-body">
+								<h5 class="card-title">MVP<span> | Most Points </span></h5>
+								<div class="d-flex align-items-center">
+									<div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+										<img class="img-icon" src={% static 'core/assets/img/bat-ball.png' %}></img>
+									</div>
+									<div class="ps-3">
+										<h5> {{ players.0.name|title }} - {{ players.0.total_points }} </h5>
+									</div>
+								</div>
+							</div>
+						</div>
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-  <script src='https://cdn.rawgit.com/pguso/jquery-plugin-circliful/master/js/jquery.circliful.min.js'></script>
-  <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
+						<div class="card info-card revenue-card">
+							<div class="card-body">
+								<h5 class="card-title">Batting <span>| Most Runs </span></h5>
+								<div class="d-flex align-items-center">
+									<div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+									 <img class="img-icon" src={% static 'core/assets/img/bat.png' %}></img>
+									</div>
+									<div class="ps-3">
+										<h5>{{ best_batsman.name|title }} - {{ best_batsman.bat_points }}  </h5>
+									</div>
+								</div>
+							</div>
+						</div>
 
-  <script>
-    $(document).ready(function(){
-      if("{{ is_match_live }}" == "True"){
-        get_live_score()
-      }
-      
-    });
-    if("{{ is_match_live }}" == "True"){
-      document.getElementById("refresh").onclick = function(){
-        get_live_score();
-      }
-    }
+						<div class="card info-card customers-card">
+							<div class="card-body">
+								<h5 class="card-title">Bowling <span>| Most Wickets</span></h5>
+								<div class="d-flex align-items-center">
+									<div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+										{% comment %} <i class="bi bi-people"></i> {% endcomment %}
+										<img class="img-icon" src={% static 'core/assets/img/ball.png' %}></img>
+									</div>
+									<div class="ps-3">
+										<h5> {{ best_bowler.name|title }} - {{ best_bowler.bowl_points|div:25  }}</h5>
+									</div>
+								</div>
+							</div>
+						</div>
+				</div><!-- End Right side columns -->
+			</div>
+		</section>
+	</main><!-- End #main -->
 
-    function viewAllNotifications(){
-      var all_notification = `{% for notification in notifications %}
-                            <div class="activity-item d-flex">
-                              <div class="activite-label">{{ notification.subject }}</div>
-                              <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
-                              <div class="activity-content">
-                                {{ notification.description }}
-                              </div>
-                            </div><!-- End activity item-->    
-                          {% endfor %}`
-      all_noti_class = document.getElementsByClassName("activity notification-class");
-      for(var i = 0; i<all_noti_class.length; i++){
-        console.log(all_noti_class[i])
-        all_noti_class[i].innerHTML = all_notification
-      }
-    }
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+	<script src='https://cdn.rawgit.com/pguso/jquery-plugin-circliful/master/js/jquery.circliful.min.js'></script>
+	<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
 
-    function viewLessNotifications(){
-      var all_notification = `{% for notification in notifications|slice:"3" %}
-                            <div class="activity-item d-flex">
-                              <div class="activite-label">{{ notification.subject }}</div>
-                              <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
-                              <div class="activity-content">
-                                {{ notification.description }}
-                              </div>
-                            </div><!-- End activity item-->    
-                          {% endfor %}`
-      all_noti_class = document.getElementsByClassName("activity notification-class");
-      for(var i = 0; i<all_noti_class.length; i++){
-        console.log(all_noti_class[i])
-        all_noti_class[i].innerHTML = all_notification
-      }
-    }
-    
+	<script>
+		$(document).ready(function(){
+			if("{{ is_match_live }}" == "True"){
+				get_live_score()
+			}
+			
+		});
+		if("{{ is_match_live }}" == "True"){
+			document.getElementById("refresh").onclick = function(){
+				get_live_score();
+			}
+		}
 
-    function get_live_score(){
-      $("#loading").bind('ajaxStart', function(){
-        $(this).show();
-        $("#live-score-div").hide();
-      }).bind('ajaxStop', function(){
-        $(this).hide();
-        $("#live-score-div").show();
-    });
-      
-      $.ajax({
-        type:"GET",
-        url: "{% url 'get-live-score' live_match_id %}",
-        success: function(data){
-          $('#live-score-div').html(data);
-        }
-      })
-    }
-  </script>
+		function viewAllNotifications(){
+			var all_notification = `{% for notification in notifications %}
+														<div class="activity-item d-flex">
+															<div class="activite-label">{{ notification.subject }}</div>
+															<i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
+															<div class="activity-content">
+																{{ notification.description }}
+															</div>
+														</div><!-- End activity item-->    
+													{% endfor %}`
+			all_noti_class = document.getElementsByClassName("activity notification-class");
+			for(var i = 0; i<all_noti_class.length; i++){
+				console.log(all_noti_class[i])
+				all_noti_class[i].innerHTML = all_notification
+			}
+		}
+
+		function viewLessNotifications(){
+			var all_notification = `{% for notification in notifications|slice:"3" %}
+														<div class="activity-item d-flex">
+															<div class="activite-label">{{ notification.subject }}</div>
+															<i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
+															<div class="activity-content">
+																{{ notification.description }}
+															</div>
+														</div><!-- End activity item-->    
+													{% endfor %}`
+			all_noti_class = document.getElementsByClassName("activity notification-class");
+			for(var i = 0; i<all_noti_class.length; i++){
+				console.log(all_noti_class[i])
+				all_noti_class[i].innerHTML = all_notification
+			}
+		}
+		
+
+		function get_live_score(){
+			$("#loading").bind('ajaxStart', function(){
+				$(this).show();
+				$("#live-score-div").hide();
+			}).bind('ajaxStop', function(){
+				$(this).hide();
+				$("#live-score-div").show();
+		});
+			
+			$.ajax({
+				type:"GET",
+				url: "{% url 'get-live-score' live_match_id %}",
+				success: function(data){
+					$('#live-score-div').html(data);
+				}
+			})
+		}
+	</script>
 
 {% endblock %}

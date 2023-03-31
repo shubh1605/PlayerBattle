@@ -978,6 +978,8 @@ def get_live_score(request, id):
 	team_scores = live_score.find('div', class_ = "ds-flex ds-flex-col ds-mt-3 md:ds-mt-0 ds-mt-0 ds-mb-1").findAll('div', class_ = "ci-team-score")
 	team_updates = {}
 	if len(team_scores) > 0:
+		t1_overs = ""
+		t1_score = ""
 		team1_name = team_scores[0].find('div', class_ = "ds-flex ds-items-center ds-min-w-0 ds-mr-1")['title']
 		if team_scores[0].find('span', class_ = "ds-text-compact-s ds-mr-0.5") != None:
 			t1_overs = team_scores[0].find('span', class_ = "ds-text-compact-s ds-mr-0.5").text

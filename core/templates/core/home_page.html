@@ -49,38 +49,6 @@
 				<!-- Left side columns -->
 				<div class="col-lg-8">  
 
-					<!-- <div class="dashboard-register">
-						<a class="btn btn-primary" href={% url 'register' %}>Register Now</a>
-					</div>
-
-					<div class="card">
-						<div class="card-body">
-							<h5 class="card-title">How to win rewards?</h5>
-							<ol class="instructions">
-								<li>Register yourself on the portal using this <a href="{% url 'register' %}" > link</a> and create your fantasy team.</li>
-								<li>Predict daily match outcomes to earn cashback incentives.</li>
-								<li>Participate in entertaining weekly events to receive surprises.</li>
-							</ol>
-
-							<h5 class="card-title">Points system</h5>
-							<ol class="instructions">
-								<li>A player receives 1 point for every run that is scored.</li>
-								<li>A player receives 25 points for every wicket that is taken.</li>
-								<li>Each point earned by your team's captain will be multiplied by 2.</li>
-								<li>Each point earned by your team's vice-captain will be multiplied by 1.5.</li>
-								<li>Each point earned by your player in a bonus match will be multiplied by 2.</li>
-								<li>Correctly predict a team to win the game to earn 20 points, while predict a tie to earn 75 points.</li>
-							</ol>
-
-							<h5 class="card-title">Daily prediction</h5>
-							<ol class="instructions">
-								<li>Maintain a streak of 5 correct prediction and receive straight cashback.</li>
-								<li>If you incorrectly predict a game, you will restart at 0.</li>
-								<li>If you miss a game, you will restart at 0.</li>
-								<li>If a match is abandoned, streaks of users who made predictions will be kept; everyone else will have to start over at 0.</li>
-							</ol>
-						</div>
-					</div> -->
 
 					<!-- Recent Activity -->
 					<div class="card">
@@ -147,22 +115,28 @@
 										<div class="card-body">
 											{% for match, value in predictions.items %}
 												<h5 class="card-title">{{ match.name|title }} <span>| {{prof.user.username}} | Streak - {{ value.streak }}</span></h5>
-												{% if value.prediction %}
+												{% if value.prediction %}	
 													<form class="row g-3" action="{% url 'predict-results' match.id %}" method="POST"> 
 														{% csrf_token %} 
 														<div class="row mt-3">
 															<div class="col-9">
-																<input style="display:none;" id="{{prof.user.username}}-predict-{{match.id}}" name="account_predicted" value={{prof.user.username}}></input>
+																<input style="display:none;" id="{{prof.user.username}}-predict-{{match.id}}" name="account_predicted-{{match.id}}" value={{prof.user.username}}></input>
 																<div class="form-floating mb-3">
-																		<select class="form-select" id="floatingSelect" aria-label="State" name="match_predict_{{ match.id }}" required>                                   
-																				<option value="{{value.prediction}}">{{ value.prediction|title }}</option>                                    
+																		<select class="form-select" id="floatingSelect" aria-label="State" name="match_predict_{{ match.id }}" required>  
+																			{% for result in value.result %} 								
+																				{% if result == value.prediction %}																				
+																					<option selected value="{{result}}">{{ value.prediction|title }}</option>
+																				{% else %}
+																					<option value="{{result}}">{{ result|title }}</option>  
+																				{% endif %}																																				
+																			{% endfor %}                                 								                                    
 																		</select>
 																		<label for="floatingSelect"> Predicted </label>
 																</div>
 															</div>
 															<div class="col-3">
 																<div class="text-center mt-1">
-																	<button type="submit" disabled class="btn btn-primary">Predict</button>
+																	<button type="submit" class="btn btn-primary">Change</button>
 																</div>
 															</div>  
 														</div>                             
@@ -173,15 +147,15 @@
 														<div class="row mt-3">
 															<div class="col-9">
 																<input style="display:none;" id="{{prof.user.username}}-predict-{{match.id}}" name="account_predicted-{{match.id}}" value={{prof.user.username}}></input>
-																	<div class="form-floating mb-3">
-																			<select class="form-select" id="floatingSelect" aria-label="State" name="match_predict_{{ match.id }}" required>
-																				<option disabled selected value> -- select an option -- </option>    
-																				{% for result in value.result %}  
-																					<option value="{{result}}">{{ result|title }}</option>  
-																				{% endfor %}
-																			</select>
-																			<label for="floatingSelect"> Predict result</label>
-																	</div>
+																<div class="form-floating mb-3">
+																	<select class="form-select" id="floatingSelect" aria-label="State" name="match_predict_{{ match.id }}" required>
+																		<option disabled selected value> -- select an option -- </option>    
+																		{% for result in value.result %} 											
+																			<option value="{{result}}">{{ result|title }}</option>  
+																		{% endfor %}
+																	</select>
+																	<label for="floatingSelect"> Predict result</label>
+																</div>
 															</div>  
 															<div class="col-3 mt-1">
 																<div class="text-center">

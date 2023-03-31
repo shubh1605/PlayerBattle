@@ -301,7 +301,9 @@ def home_page(request):
 					new_predictions[account_prof][match]['result'] = match.name.split(" vs ")
 					new_predictions[account_prof][match]['result'].append("tie")
 				else:
-					new_predictions[account_prof][match]['prediction'] = user_predictions[str(match_id)]
+					new_predictions[account_prof][match]['prediction'] = user_predictions[str(match_id)].strip()
+					new_predictions[account_prof][match]['result'] = match.name.split(" vs ")
+					new_predictions[account_prof][match]['result'].append("tie")
 		
 	context = {
 		'users':users,
@@ -320,22 +322,18 @@ def predict_results(request, id):
 	try:
 		if not request.user.is_anonymous:
 			if request.POST:
+				
 				predicted_result = request.POST['match_predict_'+str(id)]
-				account_predicted = request.POST['account_predicted-'+str(id)]
+				account_predicted = request.POST['account_predicted-'+str(id)]	
 				user_predicted = User.objects.get(username = account_predicted)
 				user_profile = Profile.objects.get(user=user_predicted)
 				user_predictions = json.loads(user_profile.daily_prediction)
 				match = Match.objects.get(id=id)
-				if match not in user_predictions:
-					user_predictions[match.id] = str(predicted_result)
-					user_profile.daily_prediction = json.dumps(user_predictions)
-					# print(user_profile.daily_prediction)
-					user_profile.save()
-					message = f'Prediction saved!'
-					messages.success(request, message)
-				else:
-					message = f'Prediction already made!'
-					messages.error(request, message )
+				user_predictions[str(match.id)] = str(predicted_result)
+				user_profile.daily_prediction = json.dumps(user_predictions)				
+				user_profile.save()
+				message = f'Prediction saved!'
+				messages.success(request, message)
 				return redirect('home-page')
 		else:
 			message = f'Please log in to predict'
@@ -446,46 +444,46 @@ def login_user(request):
 	else:
 		return render(request, 'core/login.html')
 
-def register(request):
+# def register(request):
 
-	if request.method == "POST":
-		first_name = request.POST['first_name']
-		last_name = request.POST['last_name']
-		# email = request.POST['email']
-		reference = request.POST['reference']
-		username = request.POST['username'].lower()
-		password1 = request.POST['password1']
-		password2 = request.POST['password2']
-		number = request.POST['number']
-		# existing_user = User.objects.filter(email=email)
-		all_users = User.objects.values()
-		all_usernames = [user['username'].lower() for user in all_users]
+# 	if request.method == "POST":
+# 		first_name = request.POST['first_name']
+# 		last_name = request.POST['last_name']
+# 		# email = request.POST['email']
+# 		reference = request.POST['reference']
+# 		username = request.POST['username'].lower()
+# 		password1 = request.POST['password1']
+# 		password2 = request.POST['password2']
+# 		number = request.POST['number']
+# 		# existing_user = User.objects.filter(email=email)
+# 		all_users = User.objects.values()
+# 		all_usernames = [user['username'].lower() for user in all_users]
 
-		if password1 == password2:
-			if (reference.lower() in all_usernames) or reference=="" :
-				try:
-					new_user = User.objects.create_user(first_name=first_name,last_name=last_name,username=username,password=password1)
-					new_user.save()
-					prof = Profile.objects.get(user=new_user)
-					prof.contact_no = number
-					prof.reference = reference
-					prof.save()
-					messages.success(request, "Profile created, kindly pay on UPI ID - 9819340022@paytm" )
-					# messages.success(request, "Admin will activate your account within 24 hours of payment.")
-					return redirect("login")
-				except:
-					messages.error(request, "Username already taken!" )
-					return redirect ("register")
-			else:
-				messages.error(request, "Please enter a valid reference" )
-				return redirect ("register")
+# 		if password1 == password2:
+# 			if (reference.lower() in all_usernames) or reference=="" :
+# 				try:
+# 					new_user = User.objects.create_user(first_name=first_name,last_name=last_name,username=username,password=password1)
+# 					new_user.save()
+# 					prof = Profile.objects.get(user=new_user)
+# 					prof.contact_no = number
+# 					prof.reference = reference
+# 					prof.save()
+# 					messages.success(request, "Profile created, kindly pay on UPI ID - 9819340022@paytm" )
+# 					# messages.success(request, "Admin will activate your account within 24 hours of payment.")
+# 					return redirect("login")
+# 				except:
+# 					messages.error(request, "Username already taken!" )
+# 					return redirect ("register")
+# 			else:
+# 				messages.error(request, "Please enter a valid reference" )
+# 				return redirect ("register")
 
-		else:
-			messages.error(request, "Please confirm your passwords" )
-			return redirect ("register")
+# 		else:
+# 			messages.error(request, "Please confirm your passwords" )
+# 			return redirect ("register")
 
-	else:
-		return render(request, "core/register.html")
+# 	else:
+# 		return render(request, "core/register.html")
 
 def profile(request, id):
 	logged_in_user = request.user

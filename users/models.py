@@ -29,7 +29,7 @@ class Profile(models.Model):
     connected_accounts = models.TextField(default="",blank=True,null=True)
 
     def __str__(self):
-        return self.user.username 
+        return f'{self.user.username} - {self.user.id}' 
 
     # points_description = {
     #   "Match": {

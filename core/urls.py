@@ -9,7 +9,6 @@ urlpatterns = [
     path('player_stats/',players_stats_view, name='player-stats'),
     path('calculate_player_stats',calculate_players_stats_view, name='calculate-player-stats'),
     path('login/', login_user, name = 'login'),
-    path('register/', register, name = 'register'),
     path('logout/', logout_view, name = 'logout'),
     path('profile/<id>/', profile, name='profile'),
     path('compare-teams', compare_teams, name='compare-teams'),

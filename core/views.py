@@ -899,22 +899,24 @@ def get_match_players(match_link):
 	return players_dict
 
 def get_match_points(match_link, points):
-	# series_link = "indian-premier-league-2023-1345038"
-	# series_link = "icc-men-s-t20-world-cup-2022-23-1298134"
-	series_link = "pakistan-super-league-2022-23-1332128"
+	
+	series_link = "indian-premier-league-2023-1345038"
 	source = requests.get("https://www.espncricinfo.com/series/"+series_link+"/"+match_link+"/full-scorecard").text
 	soup=BeautifulSoup(source,'lxml')
 
 	tables = soup.findAll("table",class_ = 'ds-w-full')
 
-	for table in tables:
+	for table in tables[:4]:
 		tbody = table.find("tbody")
 		trs = tbody.findAll("tr", class_ = "")
 
+		thead = table.find("thead").find("tr").find("th").text
+		
 		tp = []
 		for tr in trs:
 			td = tr.findAll("td")
-			if len(td) == 8:
+			
+			if thead=="BATTING" and len(td) > 6:
 				name_temp = td[0].find('a').attrs['href'].split('/')
 				name = name_temp[2].split('-')[:-1]
 				name = (" ".join(name)).lower()
@@ -925,7 +927,7 @@ def get_match_points(match_link, points):
 				points[name][2] += runs
 
 
-			elif len(td) > 8:
+			elif thead == "BOWLING":
 				name_temp = td[0].find('a').attrs['href'].split('/')
 				name = name_temp[2].split('-')[:-1]
 				name = (" ".join(name)).lower()
@@ -938,7 +940,7 @@ def get_match_points(match_link, points):
 	return points
 
 def get_live_score(request, id):
-	series_link = "pakistan-super-league-2022-23-1332128"
+	series_link = "indian-premier-league-2023-1345038"
 	live_match = Match.objects.get(id=id)
 
 	match_link = live_match.link

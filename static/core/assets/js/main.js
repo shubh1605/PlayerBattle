@@ -313,6 +313,8 @@
     
   })
 
+  const user_table = new simpleDatatables.DataTable("#user_points", {}).columns().sort([0])
+
   /**
    * Autoresize echart charts
    */

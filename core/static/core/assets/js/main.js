@@ -304,14 +304,16 @@
   const datatables = select('.datatable', true)
   datatables.forEach(datatable => {
     new simpleDatatables.DataTable(datatable, {
+      // aaSorting:[['0','asc']]
       // perPage: 10,
       // lengthMenu: [[10],[10]],
       // bLengthChange: false,
       // paging:false,
       // pagingType: 'full_numbers',
     });
-    
   })
+
+  const user_table = new simpleDatatables.DataTable("#user_points", {}).columns().sort([0])
 
   /**
    * Autoresize echart charts

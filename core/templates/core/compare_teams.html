@@ -67,20 +67,23 @@
                                 <div class="accordion-item">
                                   <h2 class="accordion-header" id="flush-headingOne">
                                     <button class="accordion-button acc-btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#similar_players" aria-expanded="false" aria-controls="flush-collapseOne">
-                                      Similar Players
-                                      <span class="status">
-                                        {% if similar_players.info.result != "Equal points" %}
-                                            <b>{{ similar_players.info.result|title }} is ahead by {{ similar_players.info.difference }} points</b>
-                                        {% else %}
-                                            <b>Equal points</b>
-                                        {% endif %}
-                                      </span>
+                                       <p>
+                                            Similar Players
+                                            <br/>
+                                            <span class="status">
+                                                {% if similar_players.info.result != "Equal points" %}
+                                                    <b>{{ similar_players.info.result|title|truncatechars:10 }} is ahead by {{ similar_players.info.difference }} points</b>
+                                                {% else %}
+                                                    <b>Equal points</b>
+                                                {% endif %}
+                                            </span>
+                                        </p>
                                     </button>
                                   </h2>
                                     <div id="similar_players" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
                                         <div class="row">
                                             <div class="col-6">
-                                                <div class="table-title">{{ user1|title }}</div>
+                                                <div class="table-title">{{ user1|title|truncatechars:10 }}</div>
                                                 <hr/>
                                                 <table class="table table-hover">
                                                     <thead>
@@ -101,7 +104,7 @@
                                             </div>
                                             <div class="col-6">
                                                 <table class="table table-hover">
-                                                    <div class="table-title">{{ user2|title }}</div>
+                                                    <div class="table-title">{{ user2|title|truncatechars:10 }}</div>
                                                     <hr/>
                                                     <thead>
                                                       <tr>
@@ -128,20 +131,21 @@
                                 <div class="accordion-item">
                                   <h2 class="accordion-header" id="flush-headingOne">
                                     <button class="accordion-button acc-btn collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#different_players" aria-expanded="false" aria-controls="flush-collapseOne">
-                                      Different Players
-                                      <span class="status">
-                                        {% if different_players.info.result != "Equal points" %}
-                                            <b>{{ different_players.info.result|title }} is ahead by {{ different_players.info.difference }} points</b>
-                                        {% else %}
-                                            <b>Equal points</b>
-                                        {% endif %}
-                                      </span>
+                                      <p>Different Players<br/>          
+                                        <span class="status"> 
+                                            {% if different_players.info.result != "Equal points" %}
+                                                <b>{{ different_players.info.result|title|truncatechars:10 }} is ahead by {{ different_players.info.difference }} points</b>
+                                            {% else %}
+                                                <b>Equal points</b>
+                                            {% endif %}  
+                                        </span>
+                                      </p>
                                     </button>
                                   </h2>
                                     <div id="different_players" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
                                         <div class="row">
                                             <div class="col-6">
-                                                <div class="table-title">{{ user1|title }}</div>
+                                                <div class="table-title">{{ user1|title|truncatechars:10 }}</div>
                                                 <hr/>
                                                 <table class="table table-hover">
                                                     <thead>
@@ -153,7 +157,7 @@
                                                     <tbody>
                                                         {% for key, value in different_players.team1.items %}
                                                             <tr>
-                                                                <td class="table-content">{{ key|title }}</td>
+                                                                <td class="table-content">{{ key}}</td>
                                                                 <td class="table-content">{{ value }}</td>
                                                             </tr>
                                                         {% endfor %}
@@ -161,7 +165,7 @@
                                                 </table>
                                             </div>
                                             <div class="col-6">
-                                                <div class="table-title">{{ user2|title }}</div>
+                                                <div class="table-title">{{ user2|title|truncatechars:10 }}</div>
                                                 <hr/>
                                                 <table class="table table-hover">
                                                     <thead>
@@ -188,20 +192,23 @@
                                 <div class="accordion-item">
                                   <h2 class="accordion-header" id="flush-headingOne">
                                     <button class="accordion-button collapsed acc-btn" type="button" data-bs-toggle="collapse" data-bs-target="#cap_players" aria-expanded="false" aria-controls="flush-collapseOne">
-                                      Different Position Players
-                                      <span class="status">
-                                        {% if cap_players.info.result != "Equal points" %}
-                                            <b>{{ cap_players.info.result|title }} is ahead by {{ cap_players.info.difference }} points</b>
-                                        {% else %}
-                                            <b>Equal points</b>
-                                        {% endif %}
-                                      </span>
+                                        <p>
+                                            Different Position Players
+                                            <br/>
+                                            <span class="status">
+                                                {% if cap_players.info.result != "Equal points" %}
+                                                    <b>{{ cap_players.info.result|title|truncatechars:10 }} is ahead by {{ cap_players.info.difference }} points</b>
+                                                {% else %}
+                                                    <b>Equal points</b>
+                                                {% endif %}
+                                            </span>
+                                        </p>
                                     </button>
                                   </h2>
                                     <div id="cap_players" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
                                         <div class="row">
                                             <div class="col-6">
-                                                <div class="table-title">{{ user1|title }}</div>
+                                                <div class="table-title">{{ user1|title|truncatechars:10 }}</div>
                                                 <hr/>
                                                 <table class="table table-hover">
                                                     <thead>
@@ -229,7 +236,7 @@
                                                 </table>
                                             </div>
                                             <div class="col-6">
-                                                <div class="table-title">{{ user2|title }}</div>
+                                                <div class="table-title">{{ user2|title|truncatechars:10 }}</div>
                                                 <hr/>
                                                 <table class="table table-hover">
                                                     <thead>

@@ -12,6 +12,7 @@ class Player(models.Model):
     bat_points = models.IntegerField(default=0,blank=True, null=True)
     bowl_points = models.IntegerField(default=0,blank=True, null=True)
     team_name = models.CharField(max_length = 250, blank=True, null=True)
+    chosen_team = models.IntegerField(default=0, blank=True, null=True)
   
     def __str__(self):
         return self.name

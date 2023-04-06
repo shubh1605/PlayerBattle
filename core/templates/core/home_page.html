@@ -218,8 +218,11 @@
 										<tbody>
 											{% for player in players %}
 											<tr>
-												{% comment %} <th scope="row"><a href="#">#</a></th> {% endcomment %}
-												<td class="table-content"><a href="{% url 'player-stats' %}?player_id={{ player.id }}" class="text-primary">{{ player.name|title }}</a></td>
+												<td class="table-content">
+													<a href="{% url 'player-stats' %}?player_id={{ player.id }}" class="text-primary">{{ player.name|title }}</a>
+													<br/>
+													<span class="chosen_by_span">In {{ player.chosen_team }} teams</span>
+												</td>
 												<td class="table-content">{{ player.bat_points }}</td>
 												<td class="table-content">{{ player.bowl_points }}</td>
 												<td class="table-content"><span class="badge bg-success">{{ player.total_points }}</span></td>

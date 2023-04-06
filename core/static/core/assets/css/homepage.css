@@ -107,3 +107,9 @@ marquee{
   background-color: #012970;
 }
 
+.chosen_by_span{
+  font-size: 13px;
+  font-weight: 400;
+  color: #9A9A9A;
+  font-family: "Poppins", sans-serif;
+}

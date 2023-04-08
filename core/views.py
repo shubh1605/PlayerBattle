@@ -261,6 +261,7 @@ def start_daily_match_prediction(request):
 
 def home_page(request):
 	users = Profile.objects.filter(user__in= User.objects.filter(is_active=True, is_superuser = False))
+	print(users[:5])
 	players = Player.objects.all().order_by('-total_points').values()
 	best_batsman = players.order_by('-bat_points').values()[0]
 	best_bowler = players.order_by('-bowl_points').values()[0]
@@ -344,6 +345,7 @@ def predict_results(request, id):
 		message = f'Oops! An error occured, please try again.'
 		messages.error(request, message )
 		return redirect('home-page')
+	
 def players_stats_view(request):
 	context = {}
 	all_players = Player.objects.all()
@@ -385,6 +387,28 @@ def calculate_players_stats_view(request):
 def admin_func(request):
 	if not request.user.is_anonymous:
 		if request.user.is_superuser:
+			karan = [195, 278, 177, 169, 345, 254, 331, 239, 243, 260, 246, 118, 149, 175, 211, 182, 160, 348, 207, 120, 228, 299, 183, 143, 328, 295, 330, 145, 296, 203, 276, 180, 194, 288, 163]
+			opp = 	[326, 224, 333, 323, 291, 218, 337, 342, 215, 283, 242, 214, 190, 351, 221, 140, 306, 132, 357, 275, 135, 230, 205, 126, 316, 157, 154, 155, 159, 265, 272, 196, 301, 244, 340]
+			karan_points = {}
+			opp_points = {}
+			total = 0
+			for id in karan:
+				player = Player.objects.get(id=id)
+				karan_points[player.name] = player.total_points
+				total += player.total_points
+
+			sorted_karan_points = dict(sorted(karan_points.items(), key=lambda x:x[1],reverse=True))
+			sorted_karan_points['total'] = total
+
+			total = 0
+			for id in opp:
+				player = Player.objects.get(id=id)
+				opp_points[player.name] = player.total_points
+				total += player.total_points
+
+			sorted_opp_points = dict(sorted(opp_points.items(), key=lambda x:x[1],reverse=True))
+			sorted_opp_points['total'] = total
+
 			remaining_matches = Match.objects.filter(has_completed = False, is_live = False)
 			matches_live = Match.objects.filter(is_live=True)
 			if matches_live:
@@ -401,6 +425,8 @@ def admin_func(request):
 				"match_live": matches_live,
 				"players":players,
 				"results":results,
+				"karan_points":sorted_karan_points,
+				"opp_points":sorted_opp_points,
 			}
 			return render(request, 'core/admin.html', context)
 		else:

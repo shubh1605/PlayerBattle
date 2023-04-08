@@ -112,4 +112,5 @@ marquee{
   font-weight: 400;
   color: #9A9A9A;
   font-family: "Poppins", sans-serif;
+  cursor: pointer;
 }

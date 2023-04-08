@@ -116,9 +116,10 @@
                 dataType: "json",
                 success: function( data ) 
                 {
+
                   data = JSON.parse(data)
+                  // console.log(data)
                   for( const m in data ){
-                    console.log(m)
                     matches.push(m)
                     points.push(data[m])
                     document.getElementById("player_match_points").innerHTML +=

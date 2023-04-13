@@ -261,7 +261,6 @@ def start_daily_match_prediction(request):
 
 def home_page(request):
 	users = Profile.objects.filter(user__in= User.objects.filter(is_active=True, is_superuser = False))
-	print(users[:5])
 	players = Player.objects.all().order_by('-total_points').values()
 	best_batsman = players.order_by('-bat_points').values()[0]
 	best_bowler = players.order_by('-bowl_points').values()[0]
@@ -330,6 +329,9 @@ def predict_results(request, id):
 				user_profile = Profile.objects.get(user=user_predicted)
 				user_predictions = json.loads(user_profile.daily_prediction)
 				match = Match.objects.get(id=id)
+				if str(match.id) not in user_predictions:
+					match.prediction_made = match.prediction_made + 1
+					match.save()
 				user_predictions[str(match.id)] = str(predicted_result)
 				user_profile.daily_prediction = json.dumps(user_predictions)				
 				user_profile.save()

@@ -192,6 +192,7 @@
 												<td class="table-content"><span class="badge bg-success">{{ user.rank }}</span></td>
 												<td class="table-content"><a href="{% url 'profile' user.user.id %}" class="text-primary">{{ user.user.username|title|truncatechars:14 }}</a></td>
 												<td class="table-content"><span class="badge bg-success">{{ user.total_score }}</span></td>
+												<td style="display:none"> {{ user.players.all }} </td>
 											</tr>
 											{% endfor %}
 										</tbody>

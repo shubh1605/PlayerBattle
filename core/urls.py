@@ -19,6 +19,7 @@ urlpatterns = [
     path('custom-admin/allotbonuspoints/', allot_bonus_points, name='allot-bonus-points'),
     path('custom-admin/predictresults/<id>/', predict_results, name='predict-results'),
     path('custom-admin/startdailymatchprediction/', start_daily_match_prediction, name='start-daily-match-prediction'),
+    path('custom-admin/substituteplayer/', substitute_player, name='substitute-player'),
     path('edit-captain/',edit_captain, name='edit-captain'),
     path('edit-vice-captain/',edit_vice_captain, name='edit-vice-captain'),
     path('search-user/',search_user, name='search-user'),

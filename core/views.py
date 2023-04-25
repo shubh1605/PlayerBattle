@@ -259,6 +259,61 @@ def start_daily_match_prediction(request):
 	print(match)
 	return HttpResponseRedirect(reverse('admin-func'))
 
+def substitute_player(request):
+	if not request.user.is_anonymous:
+		if request.user.is_superuser:
+			player_added_id = request.POST['player_added']
+			player_removed_id = request.POST['player_removed']
+			profile_id = request.POST['selected_user']
+			prof = Profile.objects.get(id=int(profile_id))
+			player_removed = Player.objects.get(id=int(player_removed_id))
+			player_added = Player.objects.get(id=int(player_added_id))
+			if player_removed == prof.captain:
+				return HttpResponse("removing captain")
+			if player_removed == prof.vice_captain:
+				return HttpResponse("removing vice captain")
+			prof_team = prof.players.all()
+			if player_removed not in prof_team:
+				return HttpResponse("player already not in team")
+			if player_added in prof_team:
+				return HttpResponse("player already in team")
+			
+
+			
+			prof_team = list(prof.players.all())
+			# print(prof_team)
+			prof_team.remove(player_removed)
+			prof_team.append(player_added)
+			# print(prof_team)
+			
+			# prof.players.remove(player_removed)
+			# prof.players.add(player_added)
+			
+
+			team_dict = {}
+			for player in prof_team:
+				if player.team_name in team_dict:
+					team_dict[player.team_name] += 1
+					if team_dict[player.team_name] > 2:
+						return HttpResponse("team limit exceeded")
+				else:
+					team_dict[player.team_name] = 1
+			
+			prof.players.remove(player_removed)
+			prof.players.add(player_added)
+			points = json.loads(prof.points)
+			points[player_added.name] = [0.0,0.0,0.0]
+			prof.points = json.dumps(points) 
+			prof.save()
+			# print(team_dict)
+			return HttpResponseRedirect(reverse('admin-func'))
+			# variable[0].match_live
+		else:
+			return HttpResponse("Not a super user")
+	else:
+			return HttpResponse("Login")
+
+
 def home_page(request):
 	users = Profile.objects.filter(user__in= User.objects.filter(is_active=True, is_superuser = False))
 	players = Player.objects.all().order_by('-total_points').values()
@@ -402,6 +457,8 @@ def admin_func(request):
 			sorted_karan_points = dict(sorted(karan_points.items(), key=lambda x:x[1],reverse=True))
 			sorted_karan_points['total'] = total
 
+			all_users = Profile.objects.filter(user__in= User.objects.filter(is_active=True, is_superuser = False))
+
 			total = 0
 			for id in opp:
 				player = Player.objects.get(id=id)
@@ -429,6 +486,7 @@ def admin_func(request):
 				"results":results,
 				"karan_points":sorted_karan_points,
 				"opp_points":sorted_opp_points,
+				"all_users":all_users,
 			}
 			return render(request, 'core/admin.html', context)
 		else:

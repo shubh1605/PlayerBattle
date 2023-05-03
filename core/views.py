@@ -183,7 +183,11 @@ def allot_points_to_user(match_points, match, result):
 					elif result != user_predictions[str(match_id)]:
 						user_profile.prediction_streak = update_streak(user_profile, curr_streak, False)
 				else:
-					user_profile.prediction_streak = update_streak(user_profile, curr_streak, False)
+					if result == "no result":
+						user_prediction_score += 0
+						user_match_info['match_prediction'] = 0
+					else:
+						user_profile.prediction_streak = update_streak(user_profile, curr_streak, False)
 
 				user_profile.prediction_score = user_prediction_score
 				if match in user_matches:
@@ -991,18 +995,28 @@ def get_match_points(match_link, points):
 	soup=BeautifulSoup(source,'lxml')
 
 	tables = soup.findAll("table",class_ = 'ds-w-full')
-
 	for table in tables[:4]:
 		tbody = table.find("tbody")
 		trs = tbody.findAll("tr", class_ = "")
 
-		thead = table.find("thead").find("tr").find("th").text
+		if table.find("thead"):
+			thead = table.find("thead")
+		else:
+			continue
+		if thead.find("tr"):
+			tr = thead.find("tr")
+		else:
+			continue
+		if tr.find("th"):
+			th = tr.find("th").text
+		else:
+			continue
 		
 		tp = []
 		for tr in trs:
 			td = tr.findAll("td")
 			
-			if thead=="BATTING" and len(td) > 6:
+			if th=="BATTING" and len(td) > 6:
 				name_temp = td[0].find('a').attrs['href'].split('/')
 				name = name_temp[2].split('-')[:-1]
 				name = (" ".join(name)).lower()
@@ -1013,7 +1027,7 @@ def get_match_points(match_link, points):
 				points[name][2] += runs
 
 
-			elif thead == "BOWLING":
+			elif th == "BOWLING":
 				name_temp = td[0].find('a').attrs['href'].split('/')
 				name = name_temp[2].split('-')[:-1]
 				name = (" ".join(name)).lower()

@@ -55,6 +55,8 @@ def end_match(request):
 			live_match = Match.objects.get(link=match_link)
 			player_dict = get_match_players(match_link)
 			points = get_match_points(match_link, player_dict)
+			print(points)
+			# return JsonResponse({"success":"success"})
 			for player in points:
 				if Player.objects.filter(name=player).exists():
 					p = Player.objects.get(name=player)
@@ -243,15 +245,34 @@ def allot_bonus_points(request):
 		bonus = 0
 		bonus_points = {}
 		if str(user.orange_cap.id) == orange_cap:
-			bonus += 50
-			bonus_points['orange_cap'] = 100
+			bonus += 100
+			bonus_points['Orange cap'] = 100.0
+			# print(user, " oran")
 		if str(user.purple_cap.id) ==purple_cap:
-			bonus += 50
-			bonus_points['purple_cap'] = 100
-		bonus_points['total'] = bonus
+			bonus += 100
+			bonus_points['Purple cap'] = 100.0
+			# print(user, " purple")
+		# bonus_points['total'] = bonus
 		user.total_score += bonus
 		user.bonus_points = json.dumps(bonus_points)
+
 		user.save()
+
+	i = 1
+	player_rank = 1
+	prev_score = 0
+
+	user_profiles =  Profile.objects.filter(user__in= User.objects.filter(is_active=True, is_superuser = False)).order_by('-total_score')
+	for user_profile in user_profiles:
+		if prev_score == user_profile.total_score:					
+			user_profile.rank = player_rank
+		else:
+			prev_score = user_profile.total_score 
+			user_profile.rank = i
+			player_rank = i
+		user_profile.save()
+		i += 1
+
 	return HttpResponseRedirect(reverse('admin-func'))
 
 def start_daily_match_prediction(request):
@@ -600,6 +621,9 @@ def profile(request, id):
 	points_description = json.loads(prof_viewing.points_description)
 	points_description = dict(reversed(list(points_description.items())))
 
+	bonus_description = json.loads(prof_viewing.bonus_points)
+	# print(bonus_description)
+
 	is_match_live = Variable.objects.all()[0].is_any_match_live
 
 	# print(sorted_points)
@@ -612,6 +636,7 @@ def profile(request, id):
 		'viewing_another_profile': viewing_another_prof,
 		'profile_viewing_matches': profile_viewing_matches,
 		'points_description':points_description,
+		'bonus':bonus_description,
 		'is_match_live':is_match_live,
 	}
 	return render(request, 'core/profile.html', context)

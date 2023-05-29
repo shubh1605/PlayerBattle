@@ -162,13 +162,22 @@
                             <td class="table-content">{{ points.1 }}</td>
                             <td class="table-content"><span>{{ points.2 }}</span></td>
                           </tr>
-                        {% endfor %}    
+                        {% endfor %} 
+                          
                           <tr>
                             <td class="table-content-2">Match Predictions</td>
                             <td class="table-content-2">0</td>
                             <td class="table-content-2">0</td>
                             <td class="table-content-2">{{ profile_viewing.prediction_score }}</td>
-                          </tr>     
+                          </tr> 
+                          {% for player, points in bonus.items %}
+                            <tr>
+                              <td class="table-content-2">{{ player }}</td>
+                              <td class="table-content-2">0</td>
+                              <td class="table-content-2">0</td>
+                              <td class="table-content-2">{{ points }}</td>
+                            </tr> 
+                          {% endfor %}     
                       </tbody>
                     </table>
                   </div> 
@@ -252,6 +261,8 @@
                                       <td class="table-content">0</td>
                                       <td class="table-content">{{ description.Info.match_prediction }}</td>
                                     </tr>
+                                    
+                                    
                                     <tr>
                                       <td class="table-content">Total</td>
                                       <td class="table-content">{{ description.Info.total.0 }}</td>
